@@ -1,0 +1,85 @@
+<resources>
+
+    <!-- Default Language for Fora: English -->
+
+    <string name="app_name">iMeets</string>
+    <string name="dropbox_app_key"></string>
+    <string name="ad_attribution">Ad</string>
+    <string name="fora_description">iMeets is a messaging service developed by Fora GQ.</string>
+
+    <!-- Notifications -->
+
+    <string name="ongoing_notification_title">Ongoing meeting</string>
+    <string name="ongoing_notification_text">You are currently in a meeting. Tap to return to it.</string>
+    <string name="ongoing_notification_action_hang_up">Hang up</string>
+    <string name="ongoing_notification_action_mute">Mute</string>
+    <string name="ongoing_notification_action_unmute">Unmute</string>
+    <string name="ongoing_notification_channel_name">Ongoing Conference Notifications</string>
+    <string name="msg_token_fmt">FCM registration Token: %s</string>
+
+    <!-- end of notifications -->
+
+    <string name="textfield_1_hint">Email</string>
+    <string name="textfield_2_hint">Password</string>
+    <string name="button_login">Login</string>
+    <string name="button_signup">Sign Up</string>
+    <string name="button_forgot_password">Forgot password</string>
+    <string name="fcm_message">Fora</string>
+    <string name="default_notification_channel_id">100</string>
+    <string name="invalid_email">The email %s is badly formatted.</string>
+    <string name="f_name">First name</string>
+    <string name="l_name">Last name</string>
+    <string name="your_email_and_password">Your email &amp; password</string>
+    <string name="button_previous">Back</string>
+    <string name="button_next">Next</string>
+    <string name="signup_title">Your name</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="add_profile">Add profile picture</string>
+    <string name="add_profile_info">Select your desire picture. It will be displayed publicly on your profile page.</string>
+    <string name="save_changes">Save changes</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="dark_mode_off">Off</string>
+    <string name="dark_mode_on">On</string>
+    <string name="me">Me</string>
+    <string name="type_a_message">Type a message...</string>
+    <string name="last_seen">Last seen %s</string>
+    <string name="online">Online</string>
+    <string name="login_failed">Login failed.</string>
+    <string name="dialog_email_title">Verify your email</string>
+    <string name="dialog_msg_email">The email verification link was sent to %s.</string>
+    <string name="email_not_verified">Email not verified</string>
+    <string name="verify_your_email">You need to verify your email address to be able to use this app.</string>
+    <string name="resend">Resend</string>
+    <string name="dialog_ok">Okay</string>
+    <string name="message_request">Message requests</string>
+    <string name="switch_account">Switch account</string>
+    <string name="username">Username</string>
+    <string name="text_search_hint">Search</string>
+    <string name="account_switcher">Switch account</string>
+    <string name="add_account">Add account</string>
+    <string name="error_username">%s is already taken.</string>
+    <string name="username_info">You can change your username anytime you want. Learn how to choose right username for your account. Learn more about Username on Fora.</string>
+    <string name="button_save">Save changes</string>
+    <string name="theme_settings">Themes</string>
+    <string name="my_account">Account settings</string>
+    <string name="my_status">Account status</string>
+    <string name="change_name_actionbar_title">Update name</string>
+    <string name="change_email_actionbar_title">Update email</string>
+	<string name="account_settings_actionbar_title">Account settings</string>
+
+    <!-- Sinch Client Credentials -->
+
+    <string name="SINCH_APP_KEY">5adefd30-c974-44b8-adc2-6c3417273aa2</string>
+    <string name="SINCH_APP_SECRET">1QTSSAXBL02kekXJrl2pAA==</string>
+    <string name="SINCH_ENVIRONMENT">ocra.api.sinch.com</string>
+
+    <!-- Cloudinary Cloud Name -->
+
+    <string name="cloud_name">cloudinary://@cloud-sv1</string>
+
+    <!-- Google AdMob App ID -->
+
+    <string name="app_id">ca-app-pub-1252287720252625~1078058625</string>
+
+</resources>

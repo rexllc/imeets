@@ -1,0 +1,6 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/chats" android:icon="@drawable/ion_chatbubble" android:title="Chats"/>
+    <item android:id="@+id/people" android:icon="@drawable/ion_android_people" android:title="People"/>
+
+</menu>

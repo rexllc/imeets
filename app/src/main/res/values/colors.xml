@@ -1,0 +1,17 @@
+<resources>
+
+    <color name="purple_200">#bb86fc</color>
+    <color name="purple_500">#6200ee</color>
+    <color name="purple_700">#3700b3</color>
+    <color name="teal_200">#03dac5</color>
+    <color name="teal_700">#018786</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="primary">#f43159</color>
+    <color name="grey">#9e9e9e</color>
+    <color name="sinch_purple">#ff63029d</color>
+    <color name="off_white">#fffafafa</color>
+    <color name="greyish">#f2f1f2</color>
+    <color name="daynight_text">#000000</color>
+
+</resources>

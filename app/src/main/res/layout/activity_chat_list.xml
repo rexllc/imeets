@@ -1,0 +1,120 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:clickable="true"
+    android:enabled="false"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="6dp" >
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="10dp"
+                android:src="@drawable/user_icon"
+                app:civ_border_color="#eeeeee"
+                app:civ_border_overlay="true"
+                app:civ_border_width="0dp"
+                app:civ_circle_background_color="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Chats"
+                android:textColor="@color/black"
+                android:textSize="25dp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/contacts"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/circle_view"
+                android:padding="8dp"
+                android:src="@drawable/fou_address_book" />
+
+            <ImageView
+                android:id="@+id/search"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/circle_view"
+                android:padding="8dp"
+                android:src="@drawable/oct_search_save" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/connection_status"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#f44336"
+            android:gravity="center_vertical|center_horizontal"
+            android:padding="8dp"
+            android:text="No internet connection."
+            android:textColor="@color/white"
+            android:textSize="12dp"
+            android:visibility="gone" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/main_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <me.ibrahimsn.lib.SmoothBottomBar
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom"
+            android:elevation="8dp"
+            app:backgroundColor="@color/white"
+            app:cornerRadius="0dp"
+            app:duration="200"
+            app:iconSize="25dp"
+            app:iconTint="@color/primary"
+            app:iconTintActive="@color/primary"
+            app:indicatorColor="#f5f5f5"
+            app:indicatorRadius="60dp"
+            app:itemPadding="16dp"
+            app:menu="@menu/fora_tab_menu"
+            app:sideMargins="10dp"
+            app:textColor="#f43159"
+            app:textSize="16dp" />
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="65dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:tint="@color/white"
+        app:backgroundTint="@color/primary"
+        app:elevation="6dp"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/fou_pencil" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

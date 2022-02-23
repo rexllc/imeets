@@ -1,0 +1,5 @@
+<resources>
+    <string name="notify_channel_id">100</string>
+    <string name="notify_channel_name">iMeets Push Updates</string>
+    <string name="notify_channel_description">Get updates from iMeets by Fora.</string>
+</resources>

@@ -1,0 +1,16 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut android:enabled="true" android:icon="@drawable/ic_launcher" android:shortcutDisabledMessage="@string/app_name" android:shortcutId="home" android:shortcutLongLabel="@string/app_name" android:shortcutShortLabel="@string/app_name">
+        <intent android:action="android.intent.action.VIEW" android:targetClass="gq.fora.app.activities.LaunchActivity" android:targetPackage="gq.fora.app" />
+        <!--
+         If your shortcut is associated with multiple intents, include them
+         here. The last intent in the list determines what the user sees when
+         they launch this shortcut.
+        -->
+        <categories android:name="android.shortcut.conversation" />
+
+        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
+    </shortcut>
+    <!-- Specify more shortcuts here. -->
+
+</shortcuts>

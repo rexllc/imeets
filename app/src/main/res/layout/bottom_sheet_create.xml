@@ -1,0 +1,96 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_dialog"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/line"
+        android:layout_width="60dp"
+        android:layout_height="5dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/grey" />
+
+    <LinearLayout
+        android:id="@+id/create_story"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <android.widget.ImageView
+            android:id="@+id/story"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_margin="8dp"
+            android:background="#eeeeee"
+            android:paddingBottom="12dp"
+            android:paddingTop="12dp"
+            android:src="@drawable/ic_pick_image" />
+
+        <TextView
+			android:id="@+id/create_story_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Story"
+            android:textColor="@color/black"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/create_room"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <android.widget.ImageView
+            android:id="@+id/room"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_margin="8dp"
+            android:background="#eeeeee"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:src="@drawable/cmd_readability" />
+
+        <TextView
+			android:id="@+id/create_room_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Room"
+            android:textColor="@color/black"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/join_room"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <android.widget.ImageView
+            android:id="@+id/room_1"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_margin="8dp"
+            android:background="#eeeeee"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:src="@drawable/cmd_account_multiple" />
+
+        <TextView
+			android:id="@+id/join_room_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Join Room"
+            android:textColor="@color/black"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+</LinearLayout>

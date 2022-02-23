@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "803451745906",
+    "google_firebase_url": "https://fora-store-default-rtdb.firebaseio.com",
+    "project_id": "fora-store",
+    "google_storage_bucket": "fora-store.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803451745906:android:06ab884a1ac84f6eeef4eb",
+        "android_client_info": {
+          "package_name": "gq.fora.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803451745906-e9osrb7dhppecnpc1l2ae1n198otc3rh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmMGpAixnQA1pDS_CJRJDC-U5rvZzoIcg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803451745906-e9osrb7dhppecnpc1l2ae1n198otc3rh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

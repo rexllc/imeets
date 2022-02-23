@@ -1,0 +1,387 @@
+[
+  {
+    "artifactId": "appcompat",
+    "excludes": [],
+    "groupId": "androidx.appcompat",
+    "scope": "compile",
+    "versionName": "1.4.1"
+  },
+  {
+    "artifactId": "material",
+    "excludes": [],
+    "groupId": "com.google.android.material",
+    "scope": "compile",
+    "versionName": "1.6.0-alpha02"
+  },
+  {
+    "artifactId": "constraintlayout",
+    "excludes": [],
+    "groupId": "androidx.constraintlayout",
+    "scope": "compile",
+    "versionName": "2.1.0"
+  },
+  {
+    "artifactId": "firebase-bom",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "29.0.3"
+  },
+  {
+    "artifactId": "firebase-auth",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "21.0.1"
+  },
+  {
+    "artifactId": "firebase-storage",
+    "excludes": [],
+    "groupId": "com.google.firebase\n",
+    "scope": "compile",
+    "versionName": "20.0.0"
+  },
+  {
+    "artifactId": "play-services-ads",
+    "excludes": [],
+    "groupId": "com.google.android.gms",
+    "scope": "compile",
+    "versionName": "20.1.0"
+  },
+  {
+    "artifactId": "glide",
+    "excludes": [],
+    "groupId": "com.github.bumptech.glide",
+    "scope": "compile",
+    "versionName": "4.12.0"
+  },
+  {
+    "artifactId": "gson",
+    "excludes": [],
+    "groupId": "com.google.code.gson",
+    "scope": "compile",
+    "versionName": "2.8.7"
+  },
+  {
+    "artifactId": "okhttp",
+    "excludes": [],
+    "groupId": "com.squareup.okhttp3",
+    "scope": "compile",
+    "versionName": "3.9.1"
+  },
+  {
+    "artifactId": "firebase-analytics",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "20.0.2"
+  },
+  {
+    "artifactId": "firebase-messaging",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "20.3.0"
+  },
+  {
+    "artifactId": "transport-api",
+    "excludes": [],
+    "groupId": "com.google.android.datatransport",
+    "scope": "compile",
+    "versionName": "3.0.0"
+  },
+  {
+    "artifactId": "transport-runtime",
+    "excludes": [],
+    "groupId": "com.google.android.datatransport",
+    "scope": "compile",
+    "versionName": "3.1.1"
+  },
+  {
+    "artifactId": "transport-backend-cct",
+    "excludes": [],
+    "groupId": "com.google.android.datatransport",
+    "scope": "compile",
+    "versionName": "3.1.1"
+  },
+  {
+    "artifactId": "dagger",
+    "excludes": [],
+    "groupId": "com.google.dagger",
+    "scope": "compile",
+    "versionName": "2.40.5"
+  },
+  {
+    "artifactId": "firebase-appcheck-safetynet",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "16.0.0-beta04"
+  },
+  {
+    "artifactId": "circleimageview",
+    "excludes": [],
+    "groupId": "de.hdodenhof",
+    "scope": "compile",
+    "versionName": "3.1.0"
+  },
+  {
+    "artifactId": "firebase-config",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "21.0.1"
+  },
+  {
+    "artifactId": "imagepicker",
+    "excludes": [],
+    "groupId": "com.github.dhaval2404",
+    "scope": "compile",
+    "versionName": "2.1"
+  },
+  {
+    "artifactId": "Android-SpinKit",
+    "excludes": [],
+    "groupId": "com.github.ybq",
+    "scope": "compile",
+    "versionName": "1.4.0"
+  },
+  {
+    "artifactId": "firebase-database",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "20.0.3"
+  },
+  {
+    "artifactId": "kotlin-stdlib-jdk7",
+    "excludes": [],
+    "groupId": "org.jetbrains.kotlin",
+    "scope": "compile",
+    "versionName": "1.6.10"
+  },
+  {
+    "artifactId": "kotlinx-coroutines-android",
+    "excludes": [],
+    "groupId": "org.jetbrains.kotlinx",
+    "scope": "compile",
+    "versionName": "1.6.0"
+  },
+  {
+    "artifactId": "camera-core",
+    "excludes": [],
+    "groupId": "androidx.camera",
+    "scope": "compile",
+    "versionName": "1.1.0-alpha07"
+  },
+  {
+    "artifactId": "camera-camera2",
+    "excludes": [],
+    "groupId": "androidx.camera",
+    "scope": "compile",
+    "versionName": "1.1.0-alpha07"
+  },
+  {
+    "artifactId": "camera-lifecycle",
+    "excludes": [],
+    "groupId": "androidx.camera",
+    "scope": "compile",
+    "versionName": "1.1.0-alpha07"
+  },
+  {
+    "artifactId": "camera-view",
+    "excludes": [],
+    "groupId": "androidx.camera",
+    "scope": "compile",
+    "versionName": "1.0.0-alpha27"
+  },
+  {
+    "artifactId": "camera-extensions",
+    "excludes": [],
+    "groupId": "androidx.camera",
+    "scope": "compile",
+    "versionName": "1.0.0-alpha27"
+  },
+  {
+    "artifactId": "StfalconImageViewer",
+    "excludes": [],
+    "groupId": "com.github.stfalcon-studio",
+    "scope": "compile",
+    "versionName": "v1.0.1"
+  },
+  {
+    "artifactId": "emoji-material",
+    "excludes": [],
+    "groupId": "com.vanniktech",
+    "scope": "compile",
+    "versionName": "0.8.0"
+  },
+  {
+    "artifactId": "emoji-ios",
+    "excludes": [],
+    "groupId": "com.vanniktech",
+    "scope": "compile",
+    "versionName": "0.8.0"
+  },
+  {
+    "artifactId": "volley",
+    "excludes": [],
+    "groupId": "com.android.volley",
+    "scope": "compile",
+    "versionName": "1.2.1"
+  },
+  {
+    "artifactId": "MaterialDialog",
+    "excludes": [],
+    "groupId": "dev.shreyaspatil.MaterialDialog",
+    "scope": "compile",
+    "versionName": "2.2.3"
+  },
+  {
+    "artifactId": "lottie",
+    "excludes": [],
+    "groupId": "com.airbnb.android",
+    "scope": "compile",
+    "versionName": "3.3.6"
+  },
+  {
+    "artifactId": "work-runtime",
+    "excludes": [],
+    "groupId": "androidx.work",
+    "scope": "compile",
+    "versionName": "2.7.1"
+  },
+  {
+    "artifactId": "work-rxjava2",
+    "excludes": [],
+    "groupId": "androidx.work",
+    "scope": "compile",
+    "versionName": "2.7.1"
+  },
+  {
+    "artifactId": "work-gcm",
+    "excludes": [],
+    "groupId": "androidx.work",
+    "scope": "compile",
+    "versionName": "2.7.1"
+  },
+  {
+    "artifactId": "work-multiprocess",
+    "excludes": [],
+    "groupId": "androidx.work",
+    "scope": "compile",
+    "versionName": "2.7.1"
+  },
+  {
+    "artifactId": "StoryView",
+    "excludes": [],
+    "groupId": "com.github.OMARIHAMZA",
+    "scope": "compile",
+    "versionName": "1.0.2-alpha"
+  },
+  {
+    "artifactId": "core",
+    "excludes": [],
+    "groupId": "androidx.core",
+    "scope": "compile",
+    "versionName": "1.8.0-alpha02"
+  },
+  {
+    "artifactId": "PhotoView",
+    "excludes": [],
+    "groupId": "com.github.chrisbanes",
+    "scope": "compile",
+    "versionName": "2.3.0"
+  },
+  {
+    "artifactId": "richlinkpreview",
+    "excludes": [],
+    "groupId": "io.github.ponnamkarthik",
+    "scope": "compile",
+    "versionName": "1.0.9"
+  },
+  {
+    "artifactId": "url-detector",
+    "excludes": [],
+    "groupId": "io.github.url-detector",
+    "scope": "compile",
+    "versionName": "0.1.23"
+  },
+  {
+    "artifactId": "jsoup",
+    "excludes": [],
+    "groupId": "org.jsoup",
+    "scope": "compile",
+    "versionName": "1.14.3"
+  },
+  {
+    "artifactId": "firebase-messaging-directboot",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "20.2.0"
+  },
+  {
+    "artifactId": "smartmaterialspinner",
+    "excludes": [],
+    "groupId": "com.github.chivorns",
+    "scope": "compile",
+    "versionName": "1.5.0"
+  },
+  {
+    "artifactId": "cloudinary-android",
+    "excludes": [],
+    "groupId": "com.cloudinary",
+    "scope": "compile",
+    "versionName": "1.30.0"
+  },
+  {
+    "artifactId": "rippleanimation",
+    "excludes": [],
+    "groupId": "com.wuyr",
+    "scope": "compile",
+    "versionName": "1.0.0"
+  },
+  {
+    "artifactId": "switcher",
+    "excludes": [],
+    "groupId": "io.github.bitvale",
+    "scope": "compile",
+    "versionName": "1.1.2"
+  },
+  {
+    "artifactId": "slidableactivity",
+    "excludes": [],
+    "groupId": "com.r0adkll",
+    "scope": "compile",
+    "versionName": "2.1.0"
+  },
+  {
+    "artifactId": "reactbutton",
+    "excludes": [],
+    "groupId": "io.github.amrdeveloper",
+    "scope": "compile",
+    "versionName": "2.0.3"
+  },
+  {
+    "artifactId": "SmoothBottomBar",
+    "excludes": [],
+    "groupId": "com.github.ibrahimsn98",
+    "scope": "compile",
+    "versionName": "1.7.9"
+  },
+  {
+    "artifactId": "firebase-dynamic-links",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "21.0.0"
+  },
+  {
+    "artifactId": "firebase-firestore",
+    "excludes": [],
+    "groupId": "com.google.firebase",
+    "scope": "compile",
+    "versionName": "24.0.1"
+  }
+]
