@@ -83,10 +83,6 @@ public class ChatListAdapter extends RecyclerView.Adapter {
                 LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_list, parent, false);
         // Return a new holder instance
         if (viewType == RECEIVER) return new ReceiverViewHolder(view);
-        RecyclerView.LayoutParams lp =
-                new RecyclerView.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        parent.setLayoutParams(lp);
         return new SenderViewHolder(view);
     }
 
@@ -215,7 +211,7 @@ public class ChatListAdapter extends RecyclerView.Adapter {
             sent = (CircleImageView) view.findViewById(R.id.sent);
         }
 
-        void bind(Conversation data) {
+        public void bind(Conversation data) {
             database.collection("users")
                     .document(data.chatId)
                     .addSnapshotListener(
@@ -265,9 +261,9 @@ public class ChatListAdapter extends RecyclerView.Adapter {
             sent = (CircleImageView) view.findViewById(R.id.sent);
         }
 
-        void bind(Conversation data) {
+        public void bind(Conversation data) {
             database.collection("users")
-                    .document(data.senderId)
+                    .document(data.chatId)
                     .addSnapshotListener(
                             new EventListener<DocumentSnapshot>() {
                                 @Override
