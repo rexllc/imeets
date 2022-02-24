@@ -244,8 +244,8 @@ public class ChatActivity extends BaseFragment {
     private void addToSession() {
         Bundle bundle = this.getArguments();
         HashMap<String, Object> map = new HashMap<>();
-        map.put(Constants.KEY_SENDER_ID, UserConfig.getInstance().getUid());
-        map.put(Constants.KEY_CHAT_ID, bundle.getString("id"));
+        map.put(Constants.KEY_SENDER_ID, bundle.getString("id"));
+        map.put(Constants.KEY_CHAT_ID, UserConfig.getInstance().getUid());
         map.put(Constants.KEY_TIMESTAMP, System.currentTimeMillis());
         database.collection("conversations")
                 .document(UserConfig.getInstance().getUid())
