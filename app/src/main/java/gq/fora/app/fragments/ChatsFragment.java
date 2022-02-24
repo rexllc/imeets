@@ -307,7 +307,6 @@ public class ChatsFragment extends BaseFragment {
                                 .commit();
                         bundle.putString("id", convoList.get(position).chatId);
                         chatFragment.setArguments(bundle);
-                        layoutAdapter.notifyDataSetChanged();
                     }
 
                     @Override
