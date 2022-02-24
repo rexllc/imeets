@@ -1211,7 +1211,7 @@ public class ChatsFragment extends BaseFragment {
                                                                     ForaUtil.showMessage(
                                                                             getActivity(),
                                                                             "Conversation"
-                                                                                + " deleted.");
+                                                                                    + " deleted.");
                                                                     layoutAdapter.notifyItemRemoved(
                                                                             position);
                                                                     dialog.dismiss();

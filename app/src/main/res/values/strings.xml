@@ -43,8 +43,8 @@
     <string name="dark_mode_on">On</string>
     <string name="me">Me</string>
     <string name="type_a_message">Type a message...</string>
-    <string name="last_seen">Last seen %s</string>
-    <string name="online">Online</string>
+    <string name="last_seen">Active %s</string>
+    <string name="online">Active now</string>
     <string name="login_failed">Login failed.</string>
     <string name="dialog_email_title">Verify your email</string>
     <string name="dialog_msg_email">The email verification link was sent to %s.</string>

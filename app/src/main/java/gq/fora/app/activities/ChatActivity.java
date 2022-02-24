@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -35,6 +34,7 @@ import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrInterface;
 import com.r0adkll.slidr.model.SlidrListener;
 import com.r0adkll.slidr.model.SlidrPosition;
+import com.sinch.relinker.TextUtils;
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
 
@@ -43,6 +43,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import gq.fora.app.R;
 import gq.fora.app.activities.surface.BaseFragment;
 import gq.fora.app.adapter.MessageListAdapter;
+import gq.fora.app.initializeApp;
 import gq.fora.app.models.Constants;
 import gq.fora.app.models.Messages;
 import gq.fora.app.models.UserConfig;
@@ -70,7 +71,7 @@ public class ChatActivity extends BaseFragment {
             emojiButton;
     private LinearLayout toolbar, msg_layout;
     private EmojiEditText input_text;
-    private TextView blocked, name, empty;
+    private TextView blocked, name, empty, status;
     private ProgressBar loader;
     private EmojiPopup emojiPopup;
 
@@ -141,6 +142,7 @@ public class ChatActivity extends BaseFragment {
         empty = view.findViewById(R.id.empty);
         loader = view.findViewById(R.id.loader);
         mMessageslist = view.findViewById(R.id.messagesList);
+        status = view.findViewById(R.id.status);
 
         SlidrConfig config =
                 new SlidrConfig.Builder()
@@ -212,11 +214,15 @@ public class ChatActivity extends BaseFragment {
 
         button_send.setOnClickListener(
                 (v) -> {
-                    sendTextMessage();
+                    if (!TextUtils.isEmpty(input_text.getText().toString())) {
+                        sendTextMessage();
+                    }
                 });
 
         Utils.rippleEffects(button_send, "#e0e0e0");
         Utils.rippleEffects(emojiButton, "#e0e0e0");
+
+        UserConfig.getInstance().setStatus(initializeApp.context, status, bundle.getString("id"));
 
         listAdapter.setOnItemClickListener(
                 new MessageListAdapter.ItemTouchListener() {
@@ -239,6 +245,13 @@ public class ChatActivity extends BaseFragment {
                 (v) -> {
                     ForaUtil.showMessage(getActivity(), bundle.getString("id"));
                 });
+
+        input_text.setOnClickListener(
+                (v) -> {
+                    if (emojiPopup.isShowing()) {
+                        emojiPopup.dismiss();
+                    }
+                });
     }
 
     private void addToSession() {
@@ -247,6 +260,7 @@ public class ChatActivity extends BaseFragment {
         map.put(Constants.KEY_SENDER_ID, bundle.getString("id"));
         map.put(Constants.KEY_CHAT_ID, UserConfig.getInstance().getUid());
         map.put(Constants.KEY_TIMESTAMP, System.currentTimeMillis());
+        map.put("isRequestAccepted", true);
         database.collection("conversations")
                 .document(UserConfig.getInstance().getUid())
                 .collection("inbox")
@@ -256,6 +270,7 @@ public class ChatActivity extends BaseFragment {
         map1.put(Constants.KEY_SENDER_ID, UserConfig.getInstance().getUid());
         map1.put(Constants.KEY_CHAT_ID, bundle.getString("id"));
         map1.put(Constants.KEY_TIMESTAMP, System.currentTimeMillis());
+        map1.put("isRequestAccepted", false);
         database.collection("conversations")
                 .document(bundle.getString("id"))
                 .collection("inbox")
@@ -267,6 +282,7 @@ public class ChatActivity extends BaseFragment {
         Bundle bundle = this.getArguments();
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constants.KEY_TIMESTAMP, System.currentTimeMillis());
+        map.put("isRequestAccepted", true);
         database.collection("conversations")
                 .document(UserConfig.getInstance().getUid())
                 .collection("inbox")
@@ -274,6 +290,7 @@ public class ChatActivity extends BaseFragment {
                 .update(map);
         HashMap<String, Object> map1 = new HashMap<>();
         map1.put(Constants.KEY_TIMESTAMP, System.currentTimeMillis());
+        map1.put("isRequestAccepted", true);
         database.collection("conversations")
                 .document(bundle.getString("id"))
                 .collection("inbox")
@@ -348,15 +365,5 @@ public class ChatActivity extends BaseFragment {
                 }
                 empty.setVisibility(View.GONE);
                 mMessageslist.scrollToPosition(listMessages.size() - 1);
-            };
-
-    private OnCompleteListener<QuerySnapshot> completeListener =
-            (task) -> {
-                if (task.isSuccessful()
-                        && task.getResult() != null
-                        && task.getResult().getDocuments().size() > 0) {
-                    DocumentSnapshot snapshot = task.getResult().getDocuments().get(0);
-                    conversationId = snapshot.getId();
-                }
             };
 }

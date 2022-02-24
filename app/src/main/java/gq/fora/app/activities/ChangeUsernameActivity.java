@@ -31,16 +31,15 @@ import androidx.transition.TransitionManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import gq.fora.app.R;
 import gq.fora.app.activities.surface.BaseFragment;
+import gq.fora.app.initializeApp;
 import gq.fora.app.models.UserConfig;
-import gq.fora.app.models.list.viewmodel.User;
 import gq.fora.app.utils.Utils;
 
 import java.util.HashMap;
@@ -48,6 +47,7 @@ import java.util.Map;
 
 public class ChangeUsernameActivity extends BaseFragment {
 
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
     private FirebaseDatabase firebase = FirebaseDatabase.getInstance();
     private DatabaseReference users = firebase.getReference("users");
     private FirebaseUser user;
@@ -118,20 +118,16 @@ public class ChangeUsernameActivity extends BaseFragment {
         checker.getIndeterminateDrawable().setTint(R.color.primary);
         edittext1.setFocusable(true);
 
-        users.child(UserConfig.getInstance().getUid())
-                .addListenerForSingleValueEvent(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                User userData = dataSnapshot.getValue(User.class);
-                                if (userData != null) {
-                                    edittext1.setText(userData.username);
-                                    edittext1.setSelection(edittext1.getText().length());
-                                }
-                            }
+        database.collection("users")
+                .document(UserConfig.getInstance().getUid())
+                .addSnapshotListener(
+                        (value, exception) -> {
+                            if (exception != null) return;
 
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {}
+                            if (value != null) {
+                                edittext1.setText(value.getString("username"));
+                                edittext1.setSelection(edittext1.getText().length());
+                            }
                         });
 
         edittext1.addTextChangedListener(
@@ -148,47 +144,33 @@ public class ChangeUsernameActivity extends BaseFragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        users.orderByChild("username")
-                                .equalTo(edittext1.getText().toString())
-                                .addListenerForSingleValueEvent(
-                                        new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                new Handler(Looper.getMainLooper())
-                                                        .postDelayed(new Runnable() {
-                                                                    @Override
-                                                                    public void run() {
-																		if (UserConfig.getInstance().getUsername() != null) {
-                                                                            if (!String.valueOf(edittext1.getText()).equals(UserConfig.getInstance().getUsername())) {
-                                                                                if (!TextUtils.isEmpty(String.valueOf(edittext1.getText()).trim())) {
-                                                                                    if (dataSnapshot.exists()) {
-                                                                                        error.setVisibility(View.VISIBLE);
-                                                                                        save_button.setEnabled(false);
-                                                                                        available.setVisibility(View.GONE);
-                                                                                        TransitionManager.beginDelayedTransition(linear1);
-                                                                                    } else {
-                                                                                        error.setVisibility(View.GONE);
-                                                                                        available.setVisibility(View.VISIBLE);
-                                                                                        save_button.setEnabled(true);
-                                                                                        TransitionManager.beginDelayedTransition(linear1);
-                                                                                    }
-                                                                                } else {
-                                                                                    save_button.setEnabled(false);
-                                                                                    error.setVisibility(View.GONE);
-                                                                                    available.setVisibility(View.GONE);
-                                                                                    TransitionManager.beginDelayedTransition(linear1);
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        checker.setVisibility(View.GONE);
-                                                                        error.setText(getResources().getString(R.string.error_username, edittext1.getText().toString()));
+                        database.collection("users")
+                                .whereEqualTo("username", edittext1.getText().toString())
+                                .addSnapshotListener(
+                                        (value, exception) -> {
+                                            if (value != null) {
+                                                value.getDocuments()
+                                                        .forEach(
+                                                                (docs) -> {
+                                                                    checkUsername(docs);
+                                                                    if (!docs.exists()) {
+                                                                        error.setVisibility(
+                                                                                View.GONE);
+                                                                        available.setVisibility(
+                                                                                View.VISIBLE);
+                                                                        save_button.setEnabled(
+                                                                                true);
+                                                                        TransitionManager
+                                                                                .beginDelayedTransition(
+                                                                                        linear1);
                                                                     }
-                                                                },
-                                                                2000);
+                                                                });
+                                            } else {
+                                                error.setVisibility(View.GONE);
+                                                available.setVisibility(View.VISIBLE);
+                                                save_button.setEnabled(true);
+                                                TransitionManager.beginDelayedTransition(linear1);
                                             }
-
-                                            @Override
-                                            public void onCancelled(DatabaseError databaseError) {}
                                         });
                     }
                 });
@@ -281,5 +263,48 @@ public class ChangeUsernameActivity extends BaseFragment {
             ds.setColor(Color.parseColor("#1976D2"));
             ds.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         }
+    }
+
+    private void checkUsername(@NonNull DocumentSnapshot docs) {
+        new Handler(Looper.getMainLooper())
+                .postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                if (UserConfig.getInstance().getUsername() != null) {
+                                    if (!String.valueOf(edittext1.getText())
+                                            .equals(UserConfig.getInstance().getUsername())) {
+                                        if (!TextUtils.isEmpty(
+                                                String.valueOf(edittext1.getText()).trim())) {
+                                            if (docs.exists()) {
+                                                error.setVisibility(View.VISIBLE);
+                                                save_button.setEnabled(false);
+                                                available.setVisibility(View.GONE);
+                                                TransitionManager.beginDelayedTransition(linear1);
+                                            } else {
+                                                error.setVisibility(View.GONE);
+                                                available.setVisibility(View.VISIBLE);
+                                                save_button.setEnabled(true);
+                                                TransitionManager.beginDelayedTransition(linear1);
+                                            }
+
+                                        } else {
+                                            save_button.setEnabled(false);
+                                            error.setVisibility(View.GONE);
+                                            available.setVisibility(View.GONE);
+                                            TransitionManager.beginDelayedTransition(linear1);
+                                        }
+                                    }
+                                }
+                                checker.setVisibility(View.GONE);
+                                error.setText(
+                                        initializeApp.context
+                                                .getResources()
+                                                .getString(
+                                                        R.string.error_username,
+                                                        edittext1.getText().toString()));
+                            }
+                        },
+                        2000);
     }
 }

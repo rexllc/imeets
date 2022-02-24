@@ -126,11 +126,11 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="app.fora.gq"
+                    android:host="www.imeets.gq"
                     android:pathPrefix="/__"
                     android:scheme="http" />
                 <data
-                    android:host="app.fora.gq"
+                    android:host="www.imeets.gq"
                     android:pathPrefix="/__"
                     android:scheme="https" />
             </intent-filter>

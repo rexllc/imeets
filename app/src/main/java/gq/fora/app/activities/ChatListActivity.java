@@ -236,7 +236,9 @@ public class ChatListActivity extends BaseFragment {
                     .commit();
         }
 
-        fab.setOnClickListener((View v) -> {});
+        fab.setOnClickListener((View v) -> {
+			openMenu();
+		});
 
         avatar.setOnClickListener(
                 (View v) -> {
@@ -430,4 +432,8 @@ public class ChatListActivity extends BaseFragment {
             connection_status.setVisibility(View.VISIBLE);
         }
     }
+	
+	private void openMenu() {
+		
+	}
 }

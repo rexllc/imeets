@@ -30,11 +30,9 @@ import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
 import com.google.firebase.storage.OnProgressListener;
@@ -49,6 +47,7 @@ import gq.fora.app.initializeApp;
 import gq.fora.app.models.UserConfig;
 import gq.fora.app.notify.Notify;
 import gq.fora.app.utils.FileUtils;
+import gq.fora.app.utils.ForaUtil;
 import gq.fora.app.utils.Utils;
 
 import kotlin.Unit;
@@ -69,8 +68,7 @@ public class AddProfilePictureActivity extends BaseFragment {
 
     private LinearLayout toolbar;
     private ImageView back;
-    private FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
-    private DatabaseReference users = _firebase.getReference("users");
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
     private CircleImageView avatar;
     private MaterialButton save_button;
     private static final int PROFILE_IMAGE_REQ_CODE = 101;
@@ -273,7 +271,7 @@ public class AddProfilePictureActivity extends BaseFragment {
                                                     / taskSnapshot.getTotalByteCount();
                                     int currentprogress = (int) progress;
                                     showNotification(
-                                            "Fora",
+                                            "iMeets",
                                             "Uploading Profile Picture...",
                                             100,
                                             currentprogress);
@@ -300,76 +298,48 @@ public class AddProfilePictureActivity extends BaseFragment {
                                 @Override
                                 public void onComplete(@NonNull Task<Uri> task) {
                                     if (task.isSuccessful()) {
-                                        Map<String, Object> map = new HashMap<>();
-                                        map.put("user_photo", task.getResult().toString());
-                                        users.child(UserConfig.getInstance().getUid())
-                                                .updateChildren(map);
-                                        FirebaseAuth.getInstance()
-                                                .getCurrentUser()
-                                                .updateProfile(
-                                                        new UserProfileChangeRequest.Builder()
-                                                                .setDisplayName(
-                                                                        FirebaseAuth.getInstance()
-                                                                                .getCurrentUser()
-                                                                                .getDisplayName())
-                                                                .setPhotoUri(
-                                                                        Uri.parse(
-                                                                                task.getResult()
-                                                                                        .toString()))
-                                                                .build())
-                                                .addOnCompleteListener(
-                                                        new OnCompleteListener<Void>() {
-                                                            @Override
-                                                            public void onComplete(
-                                                                    Task<Void> _param1) {
-                                                                final boolean _success =
-                                                                        _param1.isSuccessful();
-                                                                final String _errorMessage =
-                                                                        _param1.getException()
-                                                                                        != null
-                                                                                ? _param1.getException()
-                                                                                        .getMessage()
-                                                                                : "";
-
-                                                                if (_success) {
-                                                                    showNotification(
-                                                                            "Fora",
-                                                                            "Profile Picture"
-                                                                                + " updated.",
-                                                                            0,
-                                                                            0);
-                                                                    Toast.makeText(
-                                                                                    initializeApp
-                                                                                            .context,
-                                                                                    "Upload"
-                                                                                        + " complete.",
-                                                                                    Toast
-                                                                                            .LENGTH_SHORT)
-                                                                            .show();
-                                                                } else {
-                                                                    showNotification(
-                                                                            "Fora",
-                                                                            "Upload failed..",
-                                                                            0,
-                                                                            0);
-                                                                }
-                                                                FileUtils.deleteFile(imagePath);
-                                                                executor.shutdown();
-                                                            }
-                                                        });
-
+                                        updateProfile(task.getResult().toString());
                                     } else {
-                                        // Handle failures
-                                        // ...
-
-                                        Snackbar.make(
-                                                        avatar,
-                                                        "Update failed.",
-                                                        Snackbar.LENGTH_SHORT)
-                                                .show();
+                                        ForaUtil.showMessage(getActivity(), "Upload failed.");
                                     }
                                 }
                             });
         }
+    }
+
+    private void updateProfile(String url) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userPhoto", url);
+        database.collection("users").document(UserConfig.getInstance().getUid()).update(map);
+        FirebaseAuth.getInstance()
+                .getCurrentUser()
+                .updateProfile(
+                        new UserProfileChangeRequest.Builder()
+                                .setDisplayName(
+                                        FirebaseAuth.getInstance()
+                                                .getCurrentUser()
+                                                .getDisplayName())
+                                .setPhotoUri(Uri.parse(url))
+                                .build())
+                .addOnCompleteListener(
+                        new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(Task<Void> _param1) {
+                                final boolean _success = _param1.isSuccessful();
+                                final String _errorMessage =
+                                        _param1.getException() != null
+                                                ? _param1.getException().getMessage()
+                                                : "";
+
+                                if (_success) {
+                                    showNotification("iMeets", "Profile Picture updated.", 0, 0);
+                                    ForaUtil.showMessage(initializeApp.context, "Upload complete.");
+                                } else {
+                                    showNotification("iMeets", "Upload failed..", 0, 0);
+                                }
+                                FileUtils.deleteFile(imagePath);
+                                executor.shutdown();
+                            }
+                        });
     }
 }

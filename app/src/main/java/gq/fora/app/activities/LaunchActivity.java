@@ -143,7 +143,9 @@ public class LaunchActivity extends BaseActivity
         if (getSinchServiceInterface().isStarted()) {
             openActivity();
         } else {
-            getSinchServiceInterface().setStartListener(LaunchActivity.this);
+            if (!getSupportFragmentManager().isDestroyed()) {
+                getSinchServiceInterface().setStartListener(LaunchActivity.this);
+            }
         }
 
         if (UserConfig.getInstance().isLogin()) {
@@ -176,11 +178,13 @@ public class LaunchActivity extends BaseActivity
                     key_intent = uri.toString();
 
                     if (uri != null) {
-                        if (key_intent.contains("https://m.imeets.gq/profile/?id=")) {
+                        if (key_intent.contains("https://www.imeets.gq/profile/?id=")) {
                             users.orderByChild("username")
                                     .equalTo(
                                             uri.toString()
-                                                    .replace("https://m.imeets.gq/profile/?id=", ""))
+                                                    .replace(
+                                                            "https://www.imeets.gq/profile/?id=",
+                                                            ""))
                                     .addListenerForSingleValueEvent(
                                             new ValueEventListener() {
                                                 @Override
@@ -254,20 +258,22 @@ public class LaunchActivity extends BaseActivity
                     }
 
                 } catch (Exception e) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(android.R.id.content, new ChatListActivity())
-                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                                .addToBackStack(null)
-                                .commit();
-                    } else {
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(android.R.id.content, new SplashActivity())
-                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                                .addToBackStack(null)
-                                .commit();
+                    if (!getSupportFragmentManager().isDestroyed()) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(android.R.id.content, new ChatListActivity())
+                                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                                    .addToBackStack(null)
+                                    .commit();
+                        } else {
+                            getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(android.R.id.content, new SplashActivity())
+                                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
                     }
                 }
             }
