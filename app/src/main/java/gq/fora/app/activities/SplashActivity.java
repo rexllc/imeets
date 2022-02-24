@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,13 +25,8 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import gq.fora.app.R;
 import gq.fora.app.activities.surface.BaseFragment;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class SplashActivity extends BaseFragment {
 
-    private TimerTask timer;
-    private Timer _timer = new Timer();
     private SharedPreferences sharedPreferences;
     private ProgressBar loader;
 
@@ -101,31 +98,18 @@ public class SplashActivity extends BaseFragment {
     }
 
     public void initializeLogic() {
-        timer =
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        getActivity()
-                                .runOnUiThread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                if (!getChildFragmentManager().isDestroyed()) {
-                                                    getActivity()
-                                                            .getSupportFragmentManager()
-                                                            .beginTransaction()
-                                                            .add(
-                                                                    android.R.id.content,
-                                                                    new ChatListActivity())
-                                                            .setTransition(
-                                                                    FragmentTransaction
-                                                                            .TRANSIT_FRAGMENT_OPEN)
-                                                            .commit();
-                                                }
-                                            }
-                                        });
-                    }
-                };
-        _timer.schedule(timer, (2000));
+        if (!getChildFragmentManager().isDestroyed()) {
+            new Handler(Looper.getMainLooper())
+                    .postDelayed(
+                            () -> {
+                                getActivity()
+                                        .getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .add(android.R.id.content, new ChatListActivity())
+                                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                        .commit();
+                            },
+                            2000);
+        }
     }
 }
