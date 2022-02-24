@@ -1207,11 +1207,16 @@ public class ChatsFragment extends BaseFragment {
                                                         .collection("inbox")
                                                         .document(id)
                                                         .delete()
-														.addOnCompleteListener((task) -> {
-															ForaUtil.showMessage(getActivity(), "Conversation deleted.");
-															layoutAdapter.notifyItemRemoved(position);
-															dialog.dismiss();
-														});
+                                                        .addOnCompleteListener(
+                                                                (task) -> {
+                                                                    ForaUtil.showMessage(
+                                                                            getActivity(),
+                                                                            "Conversation"
+                                                                                + " deleted.");
+                                                                    layoutAdapter.notifyItemRemoved(
+                                                                            position);
+                                                                    dialog.dismiss();
+                                                                });
                                             })
                                     .setNegativeButton("Cancel", (dialog, whick) -> {});
                     builder.show();
