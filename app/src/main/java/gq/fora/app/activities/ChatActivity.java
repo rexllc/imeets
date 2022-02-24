@@ -429,7 +429,7 @@ public class ChatActivity extends BaseFragment {
                         headers.put("Content-Type", "application/json");
                         headers.put(
                                 "Authorization",
-                                "key=AAAAuxF0tnI:APA91bEFvqPRYyispnlM0KyZVDhXMQxP93N8I8yxpHwrS2Xp26XFjxdwgEJLpmxvQYU0pfP7BHNRtjkStH3HzlsHB_QDrcsAOo42u_1cv4AmVTzC_13oGiiGdAflIKEudSqKaXv2XZ3E");
+                                "Your-API-Key");
                         return headers;
                     }
                 };
