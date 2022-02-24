@@ -25,10 +25,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.linkedin.urls.Url;
 import com.linkedin.urls.detection.UrlDetector;
 import com.linkedin.urls.detection.UrlDetectorOptions;
@@ -76,7 +76,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     private String chat_path_01;
     private String chat_path_02;
     private SharedPreferences themes;
-	private FirebaseFirestore database = FirebaseFirestore.getInstance();
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     private static ItemTouchListener mItemTouchListener;
     private String senderId;
@@ -217,21 +217,12 @@ public class MessageListAdapter extends RecyclerView.Adapter {
         setAnimation(holder.itemView, position);
 
         // seen(message);
-        holder.itemView.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mItemTouchListener.onItemClick(position, view);
-                    }
-                });
+        holder.itemView.setOnClickListener((v) -> mItemTouchListener.onItemClick(position, v));
 
         holder.itemView.setOnLongClickListener(
-                new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-                        mItemTouchListener.onItemLongClick(position, view);
-                        return false;
-                    }
+                (v) -> {
+                    mItemTouchListener.onItemLongClick(position, v);
+                    return false;
                 });
     }
 
@@ -498,7 +489,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                     DateUtils.getRelativeTimeSpanString(timeText.getContext(), message.chatTime));
 
             timeText.setVisibility(View.GONE);
-			database.collection("users")
+            database.collection("users")
                     .document(message.chatId)
                     .addSnapshotListener(
                             new EventListener<DocumentSnapshot>() {
@@ -747,8 +738,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                         break;
                 }
             }
-			
-			database.collection("users")
+
+            database.collection("users")
                     .document(message.chatId)
                     .addSnapshotListener(
                             new EventListener<DocumentSnapshot>() {
@@ -811,7 +802,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                             this.setColor(d);
                             return this;
                         }
-                    }.getIns((int) 360, (int) 0, 0xFFF44336, 0xFFF44336));
+                    }.getIns(360, 0, 0xFFF44336, 0xFFF44336));
 
             users.child(message.senderId)
                     .addListenerForSingleValueEvent(
@@ -990,7 +981,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                             this.setColor(d);
                             return this;
                         }
-                    }.getIns((int) 360, (int) 0, 0xFFF44336, 0xFFF44336));
+                    }.getIns(360, 0, 0xFFF44336, 0xFFF44336));
 
             FirebaseDatabase.getInstance()
                     .getReference("users")
@@ -1128,8 +1119,8 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                         break;
                 }
             }
-			
-			database.collection("users")
+
+            database.collection("users")
                     .document(message.chatId)
                     .addSnapshotListener(
                             new EventListener<DocumentSnapshot>() {
@@ -1654,9 +1645,9 @@ public class MessageListAdapter extends RecyclerView.Adapter {
     }
 
     public interface ItemTouchListener {
-        void onItemClick(int position, View v);
+        public void onItemClick(int position, View v);
 
-        void onItemLongClick(int position, View v);
+        public void onItemLongClick(int position, View v);
     }
 
     public void setOnItemClickListener(ItemTouchListener itemTouchListener) {
