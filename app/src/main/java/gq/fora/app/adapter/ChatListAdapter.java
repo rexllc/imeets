@@ -35,10 +35,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import gq.fora.app.R;
 import gq.fora.app.initializeApp;
 import gq.fora.app.models.ChatItem;
-import gq.fora.app.models.Constants;
 import gq.fora.app.models.Conversation;
 import gq.fora.app.models.UserConfig;
 import gq.fora.app.models.list.viewmodel.User;
+import gq.fora.app.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,7 +47,7 @@ public class ChatListAdapter extends RecyclerView.Adapter {
 
     private String TAG = "FORA";
     private static final int SENDER = 1;
-	private static final int RECEIVER = 2;
+    private static final int RECEIVER = 2;
     private ArrayList<Conversation> item;
     private ChatListAdapter adapter;
     private ChatItem chat;
@@ -68,6 +68,8 @@ public class ChatListAdapter extends RecyclerView.Adapter {
 
     private NativeAdView nativeAd;
 
+    private ItemClickListener itemClickListener;
+
     public ChatListAdapter() {}
 
     public void setItems(ArrayList<Conversation> arr) {
@@ -76,40 +78,45 @@ public class ChatListAdapter extends RecyclerView.Adapter {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
         // Inflate the custom layout
-        View view = inflater.inflate(R.layout.chat_list, parent, false);
+        View view =
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_list, parent, false);
         // Return a new holder instance
         if (viewType == RECEIVER) return new ReceiverViewHolder(view);
+        RecyclerView.LayoutParams lp =
+                new RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        parent.setLayoutParams(lp);
         return new SenderViewHolder(view);
     }
-	
-	@Override
-	public int getItemViewType(int position) {
-		Conversation data = item.get(position);
-		if (data.senderId.equals(UserConfig.getInstance().getUid())) return RECEIVER;
-		return SENDER;
-	}
+
+    @Override
+    public int getItemViewType(int position) {
+        Conversation data = item.get(position);
+        if (data.senderId.equals(UserConfig.getInstance().getUid())) return RECEIVER;
+        return SENDER;
+    }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+
+        RecyclerView.LayoutParams lp =
+                new RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        holder.itemView.setLayoutParams(lp);
 
         sharedPreferences =
                 initializeApp.context.getSharedPreferences("themes", Context.MODE_PRIVATE);
 
         Conversation data = item.get(position);
 
-        time.setText(DateUtils.getRelativeTimeSpanString(time.getContext(), data.lastSent));
+        time.setText(DateUtils.getRelativeTimeSpanString(time.getContext(), data.chatTime));
         time.setTextColor(0xFF8D8E90);
 
-        messages.whereEqualTo(Constants.KEY_RECEIVER_ID, item.get(position).receiverId)
-                .limitToLast(1)
-                .orderBy("id")
-                .addSnapshotListener(eventListener);
-        messages.whereEqualTo(Constants.KEY_SENDER_ID, item.get(position).senderId)
-                .limitToLast(1)
-                .orderBy("id")
+        database.collection("messages")
+                .document(UserConfig.getInstance().getUid())
+                .collection(data.chatId)
+                .orderBy("chatTime")
                 .addSnapshotListener(eventListener);
 
         if (data.senderId.equals(UserConfig.getInstance().getUid())) {
@@ -176,6 +183,19 @@ public class ChatListAdapter extends RecyclerView.Adapter {
                                         // used here to specify individual options settings.
                                         .build())
                         .build();
+
+        Utils.rippleRoundStroke(holder.itemView, "#ffffff", "#e0e0e0", 0, 0, "#ffffff");
+
+        holder.itemView.setOnClickListener(
+                (v) -> {
+                    itemClickListener.onItemClick(holder.itemView, position);
+                });
+
+        holder.itemView.setOnLongClickListener(
+                (v) -> {
+                    itemClickListener.onItemLongClick(holder.itemView, position);
+                    return false;
+                });
     }
 
     @Override
@@ -197,7 +217,7 @@ public class ChatListAdapter extends RecyclerView.Adapter {
 
         void bind(Conversation data) {
             database.collection("users")
-                    .document(data.receiverId)
+                    .document(data.chatId)
                     .addSnapshotListener(
                             new EventListener<DocumentSnapshot>() {
                                 @Override
@@ -274,4 +294,14 @@ public class ChatListAdapter extends RecyclerView.Adapter {
                     }
                 }
             };
+
+    public interface ItemClickListener {
+        public void onItemClick(View view, int position);
+
+        public void onItemLongClick(View view, int position);
+    }
+
+    public void setOnItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
+    }
 }

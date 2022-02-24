@@ -22,10 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
@@ -211,13 +207,8 @@ public class ChatActivity extends BaseFragment {
         database.collection("messages")
                 .document(UserConfig.getInstance().getUid())
                 .collection(bundle.getString("id"))
-				.orderBy("chatTime")
+                .orderBy("chatTime")
                 .addSnapshotListener(eventListener);
-
-        /*database.collection("messages")
-                .document(bundle.getString("id"))
-                .collection(UserConfig.getInstance().getUid())
-                .addSnapshotListener(eventListener);*/
 
         button_send.setOnClickListener(
                 (v) -> {
@@ -254,31 +245,41 @@ public class ChatActivity extends BaseFragment {
         Bundle bundle = this.getArguments();
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constants.KEY_SENDER_ID, UserConfig.getInstance().getUid());
-        map.put(Constants.KEY_RECEIVER_ID, bundle.getString("id"));
+        map.put(Constants.KEY_CHAT_ID, bundle.getString("id"));
         map.put(Constants.KEY_TIMESTAMP, System.currentTimeMillis());
-        inboxRef.add(map)
-                .addOnSuccessListener(
-                        documentReference -> conversationId = documentReference.getId());
-    }
-
-    private void getSessionData() {
-        Bundle bundle = this.getArguments();
-        database.collection("messages")
-                .whereEqualTo(Constants.KEY_SENDER_ID, UserConfig.getInstance().getUid())
-                .whereEqualTo(Constants.KEY_RECEIVER_ID, bundle.getString("id"))
-                .get()
-                .addOnCompleteListener(completeListener);
-        /*database.collection("messages")
-                .whereEqualTo(Constants.KEY_SENDER_ID, bundle.getString("id"))
-                .whereEqualTo(Constants.KEY_RECEIVER_ID, UserConfig.getInstance().getUid())
-                .get()
-                .addOnCompleteListener(completeListener);*/
+        database.collection("conversations")
+                .document(UserConfig.getInstance().getUid())
+                .collection("inbox")
+                .document(bundle.getString("id"))
+                .set(map);
+        HashMap<String, Object> map1 = new HashMap<>();
+        map1.put(Constants.KEY_SENDER_ID, UserConfig.getInstance().getUid());
+        map1.put(Constants.KEY_CHAT_ID, bundle.getString("id"));
+        map1.put(Constants.KEY_TIMESTAMP, System.currentTimeMillis());
+        database.collection("conversations")
+                .document(bundle.getString("id"))
+                .collection("inbox")
+                .document(UserConfig.getInstance().getUid())
+                .set(map1);
     }
 
     private void updateSession() {
+        Bundle bundle = this.getArguments();
         HashMap<String, Object> map = new HashMap<>();
         map.put(Constants.KEY_TIMESTAMP, System.currentTimeMillis());
-        inboxRef.document(conversationId).update(map);
+        database.collection("conversations")
+                .document(UserConfig.getInstance().getUid())
+                .collection("inbox")
+                .document(bundle.getString("id"))
+                .update(map);
+        HashMap<String, Object> map1 = new HashMap<>();
+        map1.put(Constants.KEY_TIMESTAMP, System.currentTimeMillis());
+        database.collection("conversations")
+                .document(bundle.getString("id"))
+                .collection("inbox")
+                .document(UserConfig.getInstance().getUid())
+                .update(map1);
+        Log.i(ChatActivity.class.getSimpleName(), "Inbox updatedscw.");
     }
 
     private void sendTextMessage() {
@@ -307,6 +308,11 @@ public class ChatActivity extends BaseFragment {
                 .document(bundle.getString("id"))
                 .collection(UserConfig.getInstance().getUid())
                 .add(map2);
+        if (listAdapter.getItemCount() == 0) {
+            addToSession();
+        } else {
+            updateSession();
+        }
         input_text.setText("");
     }
 
@@ -320,7 +326,7 @@ public class ChatActivity extends BaseFragment {
                             Messages messages = new Messages();
                             messages.id = docs.getDocument().getString("id");
                             messages.senderId = docs.getDocument().getString("senderId");
-                            messages.chatId = docs.getDocument().getString("receiverId");
+                            messages.chatId = docs.getDocument().getString("chatId");
                             messages.type = docs.getDocument().getDouble("type");
                             messages.callType =
                                     Integer.parseInt(docs.getDocument().get("callType").toString());
@@ -342,7 +348,6 @@ public class ChatActivity extends BaseFragment {
                 }
                 empty.setVisibility(View.GONE);
                 mMessageslist.scrollToPosition(listMessages.size() - 1);
-                getSessionData();
             };
 
     private OnCompleteListener<QuerySnapshot> completeListener =

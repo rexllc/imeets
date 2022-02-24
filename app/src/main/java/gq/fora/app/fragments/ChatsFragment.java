@@ -91,6 +91,7 @@ import gq.fora.app.models.story.StoryBuilder;
 import gq.fora.app.notify.Notify;
 import gq.fora.app.service.SinchService;
 import gq.fora.app.utils.FileUtils;
+import gq.fora.app.utils.ForaUtil;
 import gq.fora.app.utils.Utils;
 import gq.fora.app.widgets.NestedHorizontalScrollView;
 
@@ -291,6 +292,30 @@ public class ChatsFragment extends BaseFragment {
                     openBottomSheet();
                 });
 
+        layoutAdapter.setOnItemClickListener(
+                new ChatListAdapter.ItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        Fragment chatFragment = new ChatActivity();
+                        Bundle bundle = new Bundle();
+                        getActivity()
+                                .getSupportFragmentManager()
+                                .beginTransaction()
+                                .setCustomAnimations(R.anim.slide_in, R.anim.slide_out)
+                                .add(android.R.id.content, chatFragment)
+                                .addToBackStack(null)
+                                .commit();
+                        bundle.putString("id", convoList.get(position).chatId);
+                        chatFragment.setArguments(bundle);
+                        layoutAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+                        openMenu(convoList.get(position).chatId, position);
+                    }
+                });
+
         rv_user_list.addOnItemTouchListener(
                 new RecyclerItemClickListener(
                         getActivity(),
@@ -314,35 +339,6 @@ public class ChatsFragment extends BaseFragment {
                             @Override
                             public void onLongItemClick(View view, int position) {
                                 // do whatever
-                            }
-                        }));
-
-        rv_chat_list.addOnItemTouchListener(
-                new RecyclerItemClickListener(
-                        getActivity(),
-                        rv_chat_list,
-                        new RecyclerItemClickListener.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(View view, int position) {
-                                Fragment chatFragment = new ChatActivity();
-                                Bundle bundle = new Bundle();
-                                getActivity()
-                                        .getSupportFragmentManager()
-                                        .beginTransaction()
-                                        .setCustomAnimations(R.anim.slide_in, R.anim.slide_out)
-                                        .add(android.R.id.content, chatFragment)
-                                        .addToBackStack(null)
-                                        .commit();
-                                bundle.putString("id", convoList.get(position).senderId);
-                                chatFragment.setArguments(bundle);
-                                layoutAdapter.notifyDataSetChanged();
-                                // do whatever
-                            }
-
-                            @Override
-                            public void onLongItemClick(View view, int position) {
-                                // do whatever
-                                openMenu(convoList.get(position).receiverId);
                             }
                         }));
 
@@ -1127,7 +1123,7 @@ public class ChatsFragment extends BaseFragment {
         mDialog.show();
     }
 
-    public void openMenu(String key) {
+    public void openMenu(String id, int position) {
         BottomSheetDialog bs = new BottomSheetDialog(getActivity());
         View sheetView =
                 LayoutInflater.from(getActivity()).inflate(R.layout.convo_bottom_sheet_menu, null);
@@ -1205,28 +1201,19 @@ public class ChatsFragment extends BaseFragment {
                                                     + " conversation?")
                                     .setPositiveButton(
                                             "Delete",
-                                            (dialog, id) -> {
-                                                messages.child(key)
-                                                        .removeValue()
-                                                        .addOnCompleteListener(
-                                                                task -> {
-                                                                    if (task.isSuccessful()) {
-                                                                        chats.child(key)
-                                                                                .removeValue();
-                                                                        Toast.makeText(
-                                                                                        getActivity(),
-                                                                                        "Conversation"
-                                                                                            + " was deleted.",
-                                                                                        Toast
-                                                                                                .LENGTH_SHORT)
-                                                                                .show();
-                                                                        layoutAdapter
-                                                                                .notifyItemRemoved(
-                                                                                        0);
-                                                                    }
-                                                                });
+                                            (dialog, which) -> {
+                                                database.collection("conversation")
+                                                        .document(UserConfig.getInstance().getUid())
+                                                        .collection("inbox")
+                                                        .document(id)
+                                                        .delete()
+														.addOnCompleteListener((task) -> {
+															ForaUtil.showMessage(getActivity(), "Conversation deleted.");
+															layoutAdapter.notifyItemRemoved(position);
+															dialog.dismiss();
+														});
                                             })
-                                    .setNegativeButton("Cancel", (dialog, id) -> {});
+                                    .setNegativeButton("Cancel", (dialog, whick) -> {});
                     builder.show();
                     bs.dismiss();
                 });
@@ -1271,9 +1258,9 @@ public class ChatsFragment extends BaseFragment {
     }
 
     private void getInboxList(int limit) {
-        database.collection("inbox")
-                .whereEqualTo(Constants.KEY_RECEIVER_ID, UserConfig.getInstance().getUid())
-                .limitToLast(limit)
+        database.collection("conversations")
+                .document(UserConfig.getInstance().getUid())
+                .collection("inbox")
                 .orderBy(Constants.KEY_TIMESTAMP)
                 .addSnapshotListener(eventListener);
     }
@@ -1286,9 +1273,9 @@ public class ChatsFragment extends BaseFragment {
                     for (DocumentChange docs : value.getDocumentChanges()) {
                         if (docs.getType() == DocumentChange.Type.ADDED) {
                             Conversation convo = new Conversation();
-                            convo.receiverId = docs.getDocument().getString("receiverId");
+                            convo.chatId = docs.getDocument().getString("chatId");
                             convo.senderId = docs.getDocument().getString("senderId");
-                            convo.lastSent = docs.getDocument().getLong("chatTime");
+                            convo.chatTime = docs.getDocument().getLong("chatTime");
                             convoList.add(convo);
                         }
                     }

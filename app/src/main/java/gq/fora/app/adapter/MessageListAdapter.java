@@ -1605,7 +1605,7 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                             .get(position)
                             .senderId
                             .equals(mMessageList.get(position - 1))) {
-                        cornerRadius(_view, "#eef1f6", "#eef1f6", 0, 35, 35, 5, 35);
+                        cornerRadius(_view, "#eef1f6", "#eef1f6", 0, 5, 35, 35, 35);
                     } else {
                         cornerRadius(_view, "#eef1f6", "#eef1f6", 0, 35, 35, 35, 35);
                     }
@@ -1616,14 +1616,14 @@ public class MessageListAdapter extends RecyclerView.Adapter {
                                     .get(position)
                                     .senderId
                                     .equals(mMessageList.get(position + 1))) {
-                        cornerRadius(_view, "#eef1f6", "#eef1f6", 0, 35, 5, 5, 35);
-                        _view2.setVisibility(View.VISIBLE);
+                        cornerRadius(_view, "#eef1f6", "#eef1f6", 0, 35, 5, 35, 5);
+                        _view2.setVisibility(View.INVISIBLE);
                     } else {
                         if (mMessageList
                                 .get(position)
                                 .senderId
                                 .equals(mMessageList.get(position + 1))) {
-                            cornerRadius(_view, "#eef1f6", "#eef1f6", 0, 35, 35, 5, 35);
+                            cornerRadius(_view, "#eef1f6", "#eef1f6", 0, 35, 35, 35, 5);
                             _view2.setVisibility(View.INVISIBLE);
                         } else {
                             cornerRadius(_view, "#eef1f6", "#eef1f6", 0, 35, 5, 35, 35);
