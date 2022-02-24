@@ -21,6 +21,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
@@ -50,8 +55,12 @@ import gq.fora.app.models.UserConfig;
 import gq.fora.app.utils.ForaUtil;
 import gq.fora.app.utils.Utils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChatActivity extends BaseFragment {
 
@@ -84,6 +93,9 @@ public class ChatActivity extends BaseFragment {
     private SlidrListener slidrListener;
 
     private String conversationId = null;
+    private String token = null;
+    private JSONObject rootObject, subObject;
+    private RequestQueue requestQueue;
 
     OnBackPressedCallback callback =
             new OnBackPressedCallback(true) {
@@ -203,6 +215,7 @@ public class ChatActivity extends BaseFragment {
                                         .skipMemoryCache(true)
                                         .thumbnail(0.1f)
                                         .into(avatar);
+                                token = value.getString("fcmToken");
                             }
                         });
 
@@ -224,17 +237,7 @@ public class ChatActivity extends BaseFragment {
 
         UserConfig.getInstance().setStatus(initializeApp.context, status, bundle.getString("id"));
 
-        listAdapter.setOnItemClickListener(
-                new MessageListAdapter.ItemTouchListener() {
-                    @Override
-                    public void onItemClick(int position, View v) {}
-
-                    @Override
-                    public void onItemLongClick(int position, View v) {
-                        Toast.makeText(getActivity(), "OnLick: " + position, Toast.LENGTH_SHORT)
-                                .show();
-                    }
-                });
+        listAdapter.setOnItemClickListener(itemClickListener);
 
         emojiButton.setOnClickListener(
                 (v) -> {
@@ -253,6 +256,15 @@ public class ChatActivity extends BaseFragment {
                     }
                 });
     }
+
+    private MessageListAdapter.ItemTouchListener itemClickListener =
+            new MessageListAdapter.ItemTouchListener() {
+                @Override
+                public void onItemClick(int position, View v) {}
+
+                @Override
+                public void onItemLongClick(int position, View v) {}
+            };
 
     private void addToSession() {
         Bundle bundle = this.getArguments();
@@ -296,7 +308,7 @@ public class ChatActivity extends BaseFragment {
                 .collection("inbox")
                 .document(UserConfig.getInstance().getUid())
                 .update(map1);
-        Log.i(ChatActivity.class.getSimpleName(), "Inbox updatedscw.");
+        Log.i(ChatActivity.class.getSimpleName(), "Inbox updated.");
     }
 
     private void sendTextMessage() {
@@ -329,6 +341,10 @@ public class ChatActivity extends BaseFragment {
             addToSession();
         } else {
             updateSession();
+        }
+        sendNotifications(input_text.getText().toString());
+        if (emojiPopup.isShowing()) {
+            emojiPopup.dismiss();
         }
         input_text.setText("");
     }
@@ -366,4 +382,58 @@ public class ChatActivity extends BaseFragment {
                 empty.setVisibility(View.GONE);
                 mMessageslist.scrollToPosition(listMessages.size() - 1);
             };
+
+    private void sendNotifications(String text) {
+        requestQueue = Volley.newRequestQueue(initializeApp.context);
+        rootObject = new JSONObject();
+        JSONObject dataObject = new JSONObject();
+        try {
+            dataObject.put("chat_id", UserConfig.getInstance().getUid());
+            dataObject.put("image_url", UserConfig.getInstance().getUserPhoto());
+            subObject = new JSONObject();
+            subObject.put("title", UserConfig.getInstance().getDisplayName());
+            subObject.put("body", text);
+            subObject.put("mutable_content", true);
+            subObject.put("sound", "tweet");
+        } catch (JSONException exception) {
+        }
+        String url0 = "https://fcm.googleapis.com/fcm/send";
+
+        try {
+            rootObject.put("to", token);
+            rootObject.put("direct_boot_ok", true);
+            rootObject.put("notification", subObject);
+            rootObject.put("data", dataObject);
+        } catch (JSONException e) {
+            Toast.makeText(getActivity(), "Error : " + e.getLocalizedMessage(), Toast.LENGTH_SHORT)
+                    .show();
+        }
+        StringRequest request =
+                new StringRequest(
+                        Request.Method.POST,
+                        url0,
+                        response -> {
+                            /*onResponse*/
+                        },
+                        error -> {
+                            /*onErrorResponse*/
+                        }) {
+                    @Override
+                    public byte[] getBody() {
+                        return rootObject.toString().getBytes();
+                    }
+
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> headers = new HashMap<>();
+                        headers.put("Content-Type", "application/json");
+                        headers.put(
+                                "Authorization",
+                                "key=AAAAuxF0tnI:APA91bEFvqPRYyispnlM0KyZVDhXMQxP93N8I8yxpHwrS2Xp26XFjxdwgEJLpmxvQYU0pfP7BHNRtjkStH3HzlsHB_QDrcsAOo42u_1cv4AmVTzC_13oGiiGdAflIKEudSqKaXv2XZ3E");
+                        return headers;
+                    }
+                };
+
+        requestQueue.add(request);
+    }
 }
