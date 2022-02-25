@@ -215,6 +215,8 @@ public class ChatListActivity extends BaseFragment {
         search = view.findViewById(R.id.search);
         contacts = view.findViewById(R.id.contacts);
         bottomBar = view.findViewById(R.id.bottomBar);
+		
+		fab.hide();
 
         fm = getActivity().getSupportFragmentManager();
 
@@ -236,9 +238,7 @@ public class ChatListActivity extends BaseFragment {
                     .commit();
         }
 
-        fab.setOnClickListener((View v) -> {
-			openMenu();
-		});
+        fab.setOnClickListener((View v) -> {});
 
         avatar.setOnClickListener(
                 (View v) -> {
@@ -266,7 +266,7 @@ public class ChatListActivity extends BaseFragment {
                                 .hide(peopleFragment)
                                 .show(chatsFragment)
                                 .commit();
-                        fab.show();
+
                         title.setText("Chats");
                         toolbar.setElevation((float) 3);
                     } else if (_position == 1) {
@@ -275,7 +275,7 @@ public class ChatListActivity extends BaseFragment {
                                 .hide(chatsFragment)
                                 .show(peopleFragment)
                                 .commit();
-                        fab.hide();
+
                         title.setText("People");
                         toolbar.setElevation((float) 0);
                     }
@@ -432,8 +432,6 @@ public class ChatListActivity extends BaseFragment {
             connection_status.setVisibility(View.VISIBLE);
         }
     }
-	
-	private void openMenu() {
-		
-	}
+
+    private void openMenu() {}
 }
