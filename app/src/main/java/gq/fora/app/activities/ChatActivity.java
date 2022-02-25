@@ -1,6 +1,7 @@
 package gq.fora.app.activities;
 
 import android.content.ComponentName;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -29,16 +30,15 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrConfig;
 import com.r0adkll.slidr.model.SlidrInterface;
 import com.r0adkll.slidr.model.SlidrListener;
 import com.r0adkll.slidr.model.SlidrPosition;
+import com.sinch.android.rtc.calling.Call;
 import com.sinch.relinker.TextUtils;
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
@@ -46,12 +46,16 @@ import com.vanniktech.emoji.EmojiPopup;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import gq.fora.app.R;
+import gq.fora.app.activities.calling.CallScreenActivity;
+import gq.fora.app.activities.calling.video.VideoCallScreenActivity;
+import gq.fora.app.activities.picker.ImagePickerActivity;
 import gq.fora.app.activities.surface.BaseFragment;
 import gq.fora.app.adapter.MessageListAdapter;
 import gq.fora.app.initializeApp;
 import gq.fora.app.models.Constants;
 import gq.fora.app.models.Messages;
 import gq.fora.app.models.UserConfig;
+import gq.fora.app.service.SinchService;
 import gq.fora.app.utils.ForaUtil;
 import gq.fora.app.utils.Utils;
 
@@ -106,10 +110,9 @@ public class ChatActivity extends BaseFragment {
             };
 
     @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {}
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {}
+    public void onServiceConnected() {
+		
+	}
 
     @Override
     public View onCreateView(
@@ -204,19 +207,16 @@ public class ChatActivity extends BaseFragment {
 
         database.collection("users")
                 .document(bundle.getString("id"))
-                .addSnapshotListener(
-                        new EventListener<DocumentSnapshot>() {
-                            @Override
-                            public void onEvent(
-                                    DocumentSnapshot value, FirebaseFirestoreException error) {
-                                name.setText(value.getString("displayName"));
-                                Glide.with(getActivity())
-                                        .load(value.getString("userPhoto"))
-                                        .skipMemoryCache(true)
-                                        .thumbnail(0.1f)
-                                        .into(avatar);
-                                token = value.getString("fcmToken");
-                            }
+                .get()
+                .addOnCompleteListener(
+                        (task) -> {
+                            name.setText(task.getResult().getString("displayName"));
+                            Glide.with(avatar)
+                                    .load(task.getResult().getString("userPhoto"))
+                                    .skipMemoryCache(true)
+                                    .thumbnail(0.1f)
+                                    .into(avatar);
+							token = task.getResult().getString("fcmToken");
                         });
 
         database.collection("messages")
@@ -227,7 +227,7 @@ public class ChatActivity extends BaseFragment {
 
         button_send.setOnClickListener(
                 (v) -> {
-                    if (!TextUtils.isEmpty(input_text.getText().toString())) {
+                    if (!TextUtils.isEmpty(input_text.getText().toString()) && !TextUtils.isEmpty(token)) {
                         sendTextMessage();
                     }
                 });
@@ -255,6 +255,37 @@ public class ChatActivity extends BaseFragment {
                         emojiPopup.dismiss();
                     }
                 });
+
+        call_button.setOnClickListener(
+                (v) -> {
+                    try {
+                        callUser();
+                    } catch (Exception exception) {
+                        ForaUtil.showMessage(getActivity(), exception.getMessage());
+                    }
+                });
+
+        video_call_button.setOnClickListener(
+                (v) -> {
+                    try {
+                        videoCallUser();
+                    } catch (Exception exception) {
+                        ForaUtil.showMessage(getActivity(), exception.getMessage());
+                    }
+                });
+
+        ImagePickerActivity imagePicker = new ImagePickerActivity(getActivity());
+        imagePicker.setCancelable(false);
+        imagePicker.setOnImagePickerListener((uri) -> {});
+
+        pick_image.setOnClickListener(
+                (v) -> {
+                    imagePicker.show(getActivity().getSupportFragmentManager(), "ImagePicker");
+                });
+
+        Utils.rippleEffects(call_button, "#e0e0e0");
+        Utils.rippleEffects(video_call_button, "#e0e0e0");
+        Utils.rippleEffects(pick_image, "#e0e0e0");
     }
 
     private MessageListAdapter.ItemTouchListener itemClickListener =
@@ -414,9 +445,13 @@ public class ChatActivity extends BaseFragment {
                         url0,
                         response -> {
                             /*onResponse*/
+							Utils utils = new Utils(getActivity());
+							utils.copyText("Response : " + response);
                         },
                         error -> {
                             /*onErrorResponse*/
+							Utils utils = new Utils(getActivity());
+							utils.copyText("Error : " + error.toString());
                         }) {
                     @Override
                     public byte[] getBody() {
@@ -435,5 +470,37 @@ public class ChatActivity extends BaseFragment {
                 };
 
         requestQueue.add(request);
+    }
+
+    private void callUser() {
+        Bundle bundle = this.getArguments();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("caller_id", UserConfig.getInstance().getUid());
+        Call call = getSinchServiceInterface().callUser(bundle.getString("id"), map);
+        String callId = call.getCallId();
+
+        /*This will starting the fucking voice call. Firstly, use your own API key for Sinch*/
+        /*Go to fucking website: https://dashboard.sinch.com and create your application here and get your API and Secret key.*/
+        Intent callActivity = new Intent();
+        callActivity.setClass(getActivity(), CallScreenActivity.class);
+        callActivity.putExtra(SinchService.CALL_ID, callId);
+        callActivity.putExtra(SinchService.EXTRA_ID, bundle.getString("id"));
+        startActivity(callActivity);
+    }
+
+    private void videoCallUser() {
+        Bundle bundle = this.getArguments();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("caller_id", UserConfig.getInstance().getUid());
+        Call call = getSinchServiceInterface().callUser(bundle.getString("id"), map);
+        String callId = call.getCallId();
+
+        /*This method will starting the fucking voice call. Firstly, use your own API key for Sinch*/
+        /*Go to fucking website: https://dashboard.sinch.com and create your application here and get your API and Secret key.*/
+        Intent callActivity = new Intent();
+        callActivity.setClass(getActivity(), VideoCallScreenActivity.class);
+        callActivity.putExtra(SinchService.CALL_ID, callId);
+        callActivity.putExtra(SinchService.EXTRA_ID, bundle.getString("id"));
+        startActivity(callActivity);
     }
 }
