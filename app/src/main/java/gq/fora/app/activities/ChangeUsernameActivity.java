@@ -145,7 +145,6 @@ public class ChangeUsernameActivity extends BaseFragment {
                     @Override
                     public void afterTextChanged(Editable s) {
                         database.collection("users")
-                                .whereEqualTo("username", edittext1.getText().toString())
                                 .addSnapshotListener(
                                         (value, exception) -> {
                                             if (value != null) {
@@ -153,17 +152,6 @@ public class ChangeUsernameActivity extends BaseFragment {
                                                         .forEach(
                                                                 (docs) -> {
                                                                     checkUsername(docs);
-                                                                    if (!docs.exists()) {
-                                                                        error.setVisibility(
-                                                                                View.GONE);
-                                                                        available.setVisibility(
-                                                                                View.VISIBLE);
-                                                                        save_button.setEnabled(
-                                                                                true);
-                                                                        TransitionManager
-                                                                                .beginDelayedTransition(
-                                                                                        linear1);
-                                                                    }
                                                                 });
                                             } else {
                                                 error.setVisibility(View.GONE);
@@ -276,7 +264,7 @@ public class ChangeUsernameActivity extends BaseFragment {
                                             .equals(UserConfig.getInstance().getUsername())) {
                                         if (!TextUtils.isEmpty(
                                                 String.valueOf(edittext1.getText()).trim())) {
-                                            if (docs.exists()) {
+                                            if (docs.getString("username").equals(edittext1.getText().toString())) {
                                                 error.setVisibility(View.VISIBLE);
                                                 save_button.setEnabled(false);
                                                 available.setVisibility(View.GONE);
