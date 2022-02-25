@@ -12,17 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import gq.fora.app.R;
 import gq.fora.app.models.UserConfig;
-import gq.fora.app.models.list.viewmodel.User;
 import gq.fora.app.utils.FileUtils;
 
 import java.util.ArrayList;
@@ -32,8 +30,7 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
 
     private ArrayList<HashMap<String, Object>> data;
     private ArrayList<HashMap<String, Object>> accountList = new ArrayList<>();
-    private FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
-    private DatabaseReference users = _firebase.getReference("users");
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
     private Activity context;
 
     public AccountListAdapter(@NonNull Activity ctx) {
@@ -61,20 +58,20 @@ public class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         String path = FileUtils.getPackageDataDir(context) + "/user/accounts.json";
         String path2 = FileUtils.getPackageDataDir(context) + "/user";
-        users.child(data.get((int) position).get("userId").toString())
-                .addListenerForSingleValueEvent(
-                        new ValueEventListener() {
+        database.collection("users")
+                .document(data.get(position).get("userId").toString())
+                .addSnapshotListener(
+                        new EventListener<DocumentSnapshot>() {
                             @Override
-                            public void onDataChange(DataSnapshot arg0) {
-                                User user = arg0.getValue(User.class);
-                                holder.displayName.setText(user.displayName);
-                                Glide.with(holder.itemView)
-                                        .load(user.userPhoto)
+                            public void onEvent(
+                                    DocumentSnapshot value, FirebaseFirestoreException error) {
+                                holder.displayName.setText(value.getString("displayName"));
+                                Glide.with(holder.avatar)
+                                        .load(value.getString("userPhoto"))
+                                        .skipMemoryCache(true)
+                                        .thumbnail(0.1f)
                                         .into(holder.avatar);
                             }
-
-                            @Override
-                            public void onCancelled(DatabaseError arg0) {}
                         });
 
         if (data.get((int) position)
