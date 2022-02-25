@@ -9,26 +9,26 @@ import android.view.Window;
 import android.view.WindowInsetsController;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.core.view.WindowInsetsControllerCompat;
+
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.sinch.android.rtc.AudioController;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallEndCause;
 import com.sinch.android.rtc.calling.CallState;
 import com.sinch.android.rtc.video.VideoCallListener;
 import com.sinch.android.rtc.video.VideoController;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+
 import gq.fora.app.R;
 import gq.fora.app.activities.calling.BaseActivity;
 import gq.fora.app.models.AudioPlayer;
-import gq.fora.app.models.list.viewmodel.User;
 import gq.fora.app.service.SinchService;
 import gq.fora.app.utils.Utils;
+
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -60,10 +60,7 @@ public class VideoCallScreenActivity extends BaseActivity {
     private ImageView endCallButton, muteButton, speakerButton;
     private CircleImageView profile_pic;
 
-    private FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
-    private DatabaseReference users = _firebase.getReference("users");
-    private DatabaseReference messages = _firebase.getReference("messages");
-    private DatabaseReference conversations = _firebase.getReference("conversations");
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     private class UpdateCallDurationTask extends TimerTask {
 
@@ -178,22 +175,17 @@ public class VideoCallScreenActivity extends BaseActivity {
 
         Call call = getSinchServiceInterface().getCall(mCallId);
         if (call != null) {
-            users.child(getIntent().getStringExtra(SinchService.EXTRA_ID))
-                    .addListenerForSingleValueEvent(
-                            new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot arg0) {
-                                    User user = arg0.getValue(User.class);
-                                    mCallerName.setText(user.displayName);
-                                    Glide.with(VideoCallScreenActivity.this)
-                                            .load(user.userPhoto)
-                                            .skipMemoryCache(true)
-                                            .thumbnail(0.1f)
-                                            .into(profile_pic);
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError arg0) {}
+            database.collection("users")
+                    .document(getIntent().getStringExtra(SinchService.EXTRA_ID))
+                    .get()
+                    .addOnCompleteListener(
+                            (task) -> {
+                                mCallerName.setText(task.getResult().getString("displayName"));
+                                Glide.with(VideoCallScreenActivity.this)
+                                        .load(task.getResult().getString("userPhoto"))
+                                        .skipMemoryCache(true)
+                                        .thumbnail(0.1f)
+                                        .into(profile_pic);
                             });
             mCallState.setText("Connecting");
             if (call.getDetails().isVideoOffered()) {
@@ -364,7 +356,7 @@ public class VideoCallScreenActivity extends BaseActivity {
                                     });
                         }
                     };
-            _timer.schedule(timer, (int) (1500));
+            _timer.schedule(timer, (1500));
         }
 
         @Override
