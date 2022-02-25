@@ -10,28 +10,23 @@ import android.view.WindowInsetsController;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.core.view.WindowInsetsControllerCompat;
+
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.sinch.android.rtc.AudioController;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallEndCause;
 import com.sinch.android.rtc.calling.CallListener;
+
 import gq.fora.app.R;
 import gq.fora.app.models.AudioPlayer;
 import gq.fora.app.models.CallType;
-import gq.fora.app.models.Message;
-import gq.fora.app.models.MessageType;
-import gq.fora.app.models.UserConfig;
-import gq.fora.app.models.list.viewmodel.User;
-import gq.fora.app.models.sessions.Session;
 import gq.fora.app.service.SinchService;
 import gq.fora.app.utils.Utils;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -60,10 +55,7 @@ public class CallScreenActivity extends BaseActivity {
     private boolean isSpeakerOn = true;
     private int type;
 
-    private FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
-    private DatabaseReference users = _firebase.getReference("users");
-    private DatabaseReference messages = _firebase.getReference("messages");
-    private DatabaseReference conversations = _firebase.getReference("conversations");
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     private class UpdateCallDurationTask extends TimerTask {
 
@@ -115,7 +107,7 @@ public class CallScreenActivity extends BaseActivity {
         insets.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
         insets.setAppearanceLightStatusBars(false);
         window.setStatusBarColor(0xFF000000);
-		window.setNavigationBarColor(0xFF000000);
+        window.setNavigationBarColor(0xFF000000);
 
         muteButton.setOnClickListener(
                 (View v) -> {
@@ -153,24 +145,17 @@ public class CallScreenActivity extends BaseActivity {
         if (call != null) {
             call.addCallListener(new SinchCallListener());
             mCallState.setText(call.getState().toString());
-            users.child(getIntent().getStringExtra(SinchService.EXTRA_ID))
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot arg0) {
-                                    User user = arg0.getValue(User.class);
-
-                                    if (user != null) {
-                                        display_name.setText(user.displayName);
-                                        Glide.with(CallScreenActivity.this)
-                                                .load(user.userPhoto)
-                                                .skipMemoryCache(true)
-                                                .thumbnail(0.1f)
-                                                .into(profile_pic);
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError arg0) {}
+            database.collection("users")
+                    .document(getIntent().getStringExtra(SinchService.EXTRA_ID))
+                    .get()
+                    .addOnCompleteListener(
+                            (task) -> {
+                                mCallerName.setText(task.getResult().getString("displayName"));
+                                Glide.with(CallScreenActivity.this)
+                                        .load(task.getResult().getString("userPhoto"))
+                                        .skipMemoryCache(true)
+                                        .thumbnail(0.1f)
+                                        .into(profile_pic);
                             });
         } else {
             Log.e(TAG, "Started with invalid callId, aborting.");
@@ -295,7 +280,6 @@ public class CallScreenActivity extends BaseActivity {
     }
 
     public void callEndedCallback(String id, String CALL_TYPE) {
-        String msg_id = messages.push().getKey();
         switch (CALL_TYPE) {
             case "FAILURE":
                 type = CallType.FAILURE;
