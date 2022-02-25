@@ -264,18 +264,15 @@ public class ChatListAdapter extends RecyclerView.Adapter {
         public void bind(Conversation data) {
             database.collection("users")
                     .document(data.chatId)
-                    .addSnapshotListener(
-                            new EventListener<DocumentSnapshot>() {
-                                @Override
-                                public void onEvent(
-                                        DocumentSnapshot value, FirebaseFirestoreException error) {
-                                    display_name.setText(value.getString("displayName"));
-                                    Glide.with(avatar)
-                                            .load(value.getString("userPhoto"))
-                                            .skipMemoryCache(true)
-                                            .thumbnail(0.1f)
-                                            .into(avatar);
-                                }
+                    .get()
+                    .addOnCompleteListener(
+                            (task) -> {
+                                display_name.setText(task.getResult().getString("displayName"));
+                                Glide.with(avatar.getContext())
+                                        .load(task.getResult().getString("userPhoto"))
+                                        .skipMemoryCache(true)
+                                        .thumbnail(0.1f)
+                                        .into(avatar);
                             });
         }
     }
