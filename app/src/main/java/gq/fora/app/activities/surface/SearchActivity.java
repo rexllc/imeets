@@ -152,32 +152,35 @@ public class SearchActivity extends Fragment {
                     @Override
                     public void onEvent(QuerySnapshot value, FirebaseFirestoreException error) {
                         for (DocumentChange snapshot : value.getDocumentChanges()) {
-                            if (UserConfig.getInstance()
-                                    .getUid()
-                                    .equals(snapshot.getDocument().getId())) {
-                                continue;
+                            if (snapshot.getType() == DocumentChange.Type.ADDED) {
+                                if (UserConfig.getInstance()
+                                        .getUid()
+                                        .equals(snapshot.getDocument().getId())) {
+                                    continue;
+                                }
+                                User user = new User();
+                                user.displayName = snapshot.getDocument().getString("displayName");
+                                user.userPhoto = snapshot.getDocument().getString("userPhoto");
+                                user.username = snapshot.getDocument().getString("username");
+                                user.userId = snapshot.getDocument().getString("userId");
+                                userList.add(user);
                             }
-                            User user = new User();
-                            user.displayName = snapshot.getDocument().getString("displayName");
-                            user.userPhoto = snapshot.getDocument().getString("userPhoto");
-                            user.username = snapshot.getDocument().getString("username");
-                            user.userId = snapshot.getDocument().getString("userId");
-                            userList.add(user);
-                        }
 
-                        Collections.shuffle(userList);
-                        UserListAdapter layoutAdapter = new UserListAdapter(userList);
-                        rv_chat_list.setAdapter(layoutAdapter);
-                        rv_chat_list.setHasFixedSize(true);
-                        rv_chat_list.setLayoutManager(layoutManager);
-                        if (userList.size() == 0) {
-                            layoutAdapter.notifyDataSetChanged();
-                        } else {
-                            layoutAdapter.notifyItemRangeChanged(userList.size(), userList.size());
+                            Collections.shuffle(userList);
+                            UserListAdapter layoutAdapter = new UserListAdapter(userList);
+                            rv_chat_list.setAdapter(layoutAdapter);
+                            rv_chat_list.setHasFixedSize(true);
+                            rv_chat_list.setLayoutManager(layoutManager);
+                            if (userList.size() == 0) {
+                                layoutAdapter.notifyDataSetChanged();
+                            } else {
+                                layoutAdapter.notifyItemRangeChanged(
+                                        userList.size(), userList.size());
+                            }
+                            totalPages = userList.size();
+                            loader.setVisibility(View.GONE);
+                            loading = false;
                         }
-                        totalPages = userList.size();
-                        loader.setVisibility(View.GONE);
-                        loading = false;
                     }
                 });
 
