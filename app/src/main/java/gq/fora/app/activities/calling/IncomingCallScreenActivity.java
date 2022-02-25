@@ -11,29 +11,23 @@ import android.view.Window;
 import android.view.WindowInsetsController;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.core.view.WindowInsetsControllerCompat;
+
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.sinch.android.rtc.PushPair;
 import com.sinch.android.rtc.calling.Call;
 import com.sinch.android.rtc.calling.CallEndCause;
 import com.sinch.android.rtc.calling.CallListener;
 import com.sinch.android.rtc.video.VideoCallListener;
+
 import gq.fora.app.R;
 import gq.fora.app.activities.calling.video.VideoCallScreenActivity;
 import gq.fora.app.models.AudioPlayer;
-import gq.fora.app.models.CallType;
-import gq.fora.app.models.Message;
-import gq.fora.app.models.MessageType;
-import gq.fora.app.models.UserConfig;
-import gq.fora.app.models.list.viewmodel.User;
-import gq.fora.app.models.sessions.Session;
 import gq.fora.app.service.SinchService;
 import gq.fora.app.utils.Utils;
+
 import java.util.List;
 
 public class IncomingCallScreenActivity extends BaseActivity {
@@ -42,10 +36,7 @@ public class IncomingCallScreenActivity extends BaseActivity {
     private String mCallId;
     private AudioPlayer mAudioPlayer;
 
-    private FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
-    private DatabaseReference users = _firebase.getReference("users");
-    private DatabaseReference messages = _firebase.getReference("messages");
-    private DatabaseReference conversations = _firebase.getReference("conversations");
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
 
     public static final String ACTION_ANSWER = "answer";
     public static final String ACTION_IGNORE = "ignore";
@@ -96,7 +87,7 @@ public class IncomingCallScreenActivity extends BaseActivity {
         insets.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
         insets.setAppearanceLightStatusBars(false);
         window.setStatusBarColor(0xFF000000);
-		window.setNavigationBarColor(0xFF000000);
+        window.setNavigationBarColor(0xFF000000);
     }
 
     @Override
@@ -137,22 +128,17 @@ public class IncomingCallScreenActivity extends BaseActivity {
                 call.addCallListener(new SinchCallListener());
             }
 
-            users.child(call.getHeaders().get("caller_id"))
-                    .addListenerForSingleValueEvent(
-                            new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot arg0) {
-                                    User user = arg0.getValue(User.class);
-                                    display_name.setText(user.displayName);
-                                    Glide.with(IncomingCallScreenActivity.this)
-                                            .load(user.userPhoto)
-                                            .skipMemoryCache(true)
-                                            .thumbnail(0.1f)
-                                            .into(profile_pic);
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError arg0) {}
+            database.collection("users")
+                    .document(call.getHeaders().get("caller_id"))
+                    .get()
+                    .addOnCompleteListener(
+                            (task) -> {
+                                display_name.setText(task.getResult().getString("displayName"));
+                                Glide.with(IncomingCallScreenActivity.this)
+                                        .load(task.getResult().getString("userPhoto"))
+                                        .skipMemoryCache(true)
+                                        .thumbnail(0.1f)
+                                        .into(profile_pic);
                             });
 
             if (ACTION_ANSWER.equals(mAction)) {
@@ -178,13 +164,13 @@ public class IncomingCallScreenActivity extends BaseActivity {
                 intent.putExtra(SinchService.CALL_ID, mCallId);
                 intent.putExtra(SinchService.EXTRA_ID, call.getHeaders().get("caller_id"));
                 startActivity(intent);
-				call.answer();
+                call.answer();
             } else {
                 Intent intent = new Intent(this, CallScreenActivity.class);
                 intent.putExtra(SinchService.CALL_ID, mCallId);
                 intent.putExtra(SinchService.EXTRA_ID, call.getHeaders().get("caller_id"));
                 startActivity(intent);
-				call.answer();
+                call.answer();
             }
         } else {
             finish();
@@ -302,7 +288,5 @@ public class IncomingCallScreenActivity extends BaseActivity {
         getWindow().setStatusBarColor(0xFFFFFFFF);
     }
 
-    public void callEndedCallback(String id) {
-        
-    }
+    public void callEndedCallback(String id) {}
 }
