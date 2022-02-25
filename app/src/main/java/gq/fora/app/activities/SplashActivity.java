@@ -21,12 +21,15 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import gq.fora.app.R;
 import gq.fora.app.activities.surface.BaseFragment;
+import gq.fora.app.fragments.MaintenanceModeFragment;
 
 public class SplashActivity extends BaseFragment {
 
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
     private SharedPreferences sharedPreferences;
     private ProgressBar loader;
 
@@ -102,14 +105,44 @@ public class SplashActivity extends BaseFragment {
             new Handler(Looper.getMainLooper())
                     .postDelayed(
                             () -> {
-                                getActivity()
-                                        .getSupportFragmentManager()
-                                        .beginTransaction()
-                                        .add(android.R.id.content, new ChatListActivity())
-                                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                                        .commit();
+                                if (isSystemMaintenance()) {
+                                    getActivity()
+                                            .getSupportFragmentManager()
+                                            .beginTransaction()
+                                            .add(
+                                                    android.R.id.content,
+                                                    new MaintenanceModeFragment())
+                                            .setTransition(
+                                                    FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                            .commit();
+                                } else {
+                                    getActivity()
+                                            .getSupportFragmentManager()
+                                            .beginTransaction()
+                                            .add(android.R.id.content, new ChatListActivity())
+                                            .setTransition(
+                                                    FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                                            .commit();
+                                }
                             },
                             2000);
         }
+    }
+
+    private boolean isSystemMaintenance() {
+        database.collection("system")
+                .document("maintenance")
+                .get()
+                .addOnCompleteListener(
+                        (snapshot) -> {
+                            if (snapshot != null) {
+                                if (snapshot.getResult().contains("isMaintenance")) {
+                                    if (snapshot.getResult().getBoolean("isMaintenance") == true) {
+                                        return;
+                                    }
+                                }
+                            }
+                        });
+        return false;
     }
 }
