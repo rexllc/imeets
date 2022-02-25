@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -31,12 +32,15 @@ import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
+
 import com.bumptech.glide.Glide;
 import com.chivorn.smartmaterialspinner.SmartMaterialSpinner;
 import com.google.android.material.snackbar.Snackbar;
+
 import gq.fora.app.R;
 import gq.fora.app.activities.picker.listener.SwipeDismissTouchListener;
 import gq.fora.app.widgets.GridSpacingItemDecoration;
+
 import java.io.*;
 import java.io.File;
 import java.text.*;
@@ -133,15 +137,11 @@ public class ImagePickerActivity extends DialogFragment {
         requireActivity()
                 .getOnBackPressedDispatcher()
                 .addCallback(getViewLifecycleOwner(), callback);
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_DENIED) {
-                requestStoragePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-            } else {
-                // Granted
-                initializeLogic();
-            }
+        if (getActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_DENIED) {
+            requestStoragePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
         } else {
+            // Granted
             initializeLogic();
         }
         return _view;
@@ -179,10 +179,10 @@ public class ImagePickerActivity extends DialogFragment {
                             AdapterView<?> adapterView, View view, int position, long id) {
                         imageList.setAdapter(
                                 new ImageAdapter(
-                                        getActivity(), getAllBuckets().get((int) position)));
+                                        getActivity(), getAllBuckets().get(position)));
                         imageList.setHasFixedSize(true);
                         imageList.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-						spinner1.setHint(getAllBuckets().get((int) position));
+                        spinner1.setHint(getAllBuckets().get(position));
                     }
 
                     @Override
@@ -386,7 +386,7 @@ public class ImagePickerActivity extends DialogFragment {
                             if (images != null && !images.isEmpty()) {
                                 if (pickListener != null) {
                                     pickListener.onImagePick(
-                                            Uri.fromFile(new File(images.get((int) position))));
+                                            Uri.fromFile(new File(images.get(position))));
                                     dismiss();
                                 }
                             }
