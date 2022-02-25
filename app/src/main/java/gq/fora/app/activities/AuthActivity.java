@@ -362,7 +362,7 @@ public class AuthActivity extends Fragment {
         } else {
             for (int _i = 0; _i < (float) (accountList2.size()); _i++) {
                 if (accountList2
-                        .get(_i)
+                        .get((int) position)
                         .get("userId")
                         .toString()
                         .equals(UserConfig.getInstance().getUid())) {
@@ -397,6 +397,7 @@ public class AuthActivity extends Fragment {
                             .addToBackStack(null)
                             .commit();
                 }
+				position++;
             }
         }
     }
