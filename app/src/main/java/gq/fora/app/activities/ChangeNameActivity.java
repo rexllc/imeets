@@ -27,16 +27,11 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import gq.fora.app.R;
 import gq.fora.app.activities.surface.BaseFragment;
 import gq.fora.app.models.UserConfig;
-import gq.fora.app.models.list.viewmodel.User;
 import gq.fora.app.utils.PreferencesManager;
 import gq.fora.app.utils.Utils;
 
@@ -44,8 +39,7 @@ import java.util.HashMap;
 
 public class ChangeNameActivity extends BaseFragment {
 
-    private FirebaseDatabase firebase = FirebaseDatabase.getInstance();
-    private DatabaseReference users = firebase.getReference("users");
+    private FirebaseFirestore database = FirebaseFirestore.getInstance();
     private TextView change_name_info, title;
     private FrameLayout actionbar;
     private EditText first_name, middle_name, last_name;
@@ -114,27 +108,21 @@ public class ChangeNameActivity extends BaseFragment {
                     confirmPassword();
                 });
 
-        users.child(UserConfig.getInstance().getUid())
-                .addListenerForSingleValueEvent(
-                        new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                User user = dataSnapshot.getValue(User.class);
-
-                                if (user != null) {
-                                    first_name.setText(user.firstName);
-                                    if (user.middleName != null) {
-                                        middle_name.setText(user.middleName);
-                                    }
-                                    last_name.setText(user.lastName);
-                                    first_name.setSelection(first_name.getText().length());
-                                    middle_name.setSelection(middle_name.getText().length());
-                                    last_name.setSelection(last_name.getText().length());
+        database.collection("users")
+                .document(UserConfig.getInstance().getUid())
+                .get()
+                .addOnCompleteListener(
+                        (task) -> {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                first_name.setText(task.getResult().getString("firstName"));
+                                if (task.getResult().getString("middleName") != null) {
+                                    middle_name.setText(task.getResult().getString("middleName"));
                                 }
+                                last_name.setText(task.getResult().getString("lastName"));
+                                first_name.setSelection(first_name.getText().length());
+                                middle_name.setSelection(middle_name.getText().length());
+                                last_name.setSelection(last_name.getText().length());
                             }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {}
                         });
     }
 
@@ -200,19 +188,20 @@ public class ChangeNameActivity extends BaseFragment {
                 .addOnCompleteListener(
                         (task) -> {
                             HashMap<String, Object> map = new HashMap<>();
-                            map.put("first_name", first_name.getText().toString());
-                            map.put("middle_name", middle_name.getText().toString());
-                            map.put("last_name", last_name.getText().toString());
+                            map.put("firstName", first_name.getText().toString());
+                            map.put("middleName", middle_name.getText().toString());
+                            map.put("lastName", last_name.getText().toString());
                             map.put(
-                                    "display_name",
+                                    "displayName",
                                     first_name.getText().toString().trim()
                                             + " "
                                             + middle_name.getText().toString().trim()
                                             + " "
                                             + last_name.getText().toString().trim());
-                            users.child(UserConfig.getInstance().getUid())
-                                    .updateChildren(map)
-                                    .addOnSuccessListener(
+                            database.collection("users")
+                                    .document(UserConfig.getInstance().getUid())
+                                    .update(map)
+                                    .addOnCompleteListener(
                                             (success) -> {
                                                 getActivity()
                                                         .getSupportFragmentManager()
