@@ -5,6 +5,6 @@
   "javaTargetVersion": "11",
   "useR8": false,
   "targetSdkVersion": 31.0,
-  "versionName": "1.0-alpha",
-  "versionCode": 1.0.0
+  "versionName": "0.1.0-alpha",
+  "versionCode": "1.0.0"
 }

@@ -60,7 +60,7 @@
                 android:layout_marginRight="10dp"
                 android:background="@drawable/circle_view"
                 android:padding="8dp"
-                android:src="@drawable/oct_search_save" />
+                android:src="@drawable/fou_pencil" />
         </LinearLayout>
 
         <TextView

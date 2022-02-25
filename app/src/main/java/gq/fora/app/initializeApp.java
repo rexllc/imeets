@@ -88,7 +88,7 @@ public class initializeApp extends Application
                                 data.edit().putString("token", token).commit();
 
                                 if (UserConfig.getInstance().isLogin()) {
-                                    checkToken(token);
+                                    UserConfig.getInstance().updateToken(token);
                                 }
 
                                 // Log and toast
@@ -146,41 +146,5 @@ public class initializeApp extends Application
     @Override
     public ComponentName startForegroundService(Intent service) {
         return super.startForegroundService(service);
-    }
-
-    public void checkToken(String token) {
-
-        FirebaseDatabase _firebase = FirebaseDatabase.getInstance();
-        DatabaseReference users = _firebase.getReference("users");
-
-        users.addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot _dataSnapshot) {
-
-                        try {
-                            GenericTypeIndicator<HashMap<String, Object>> _ind =
-                                    new GenericTypeIndicator<HashMap<String, Object>>() {};
-                            for (DataSnapshot _data : _dataSnapshot.getChildren()) {
-                                HashMap<String, Object> _map = _data.getValue(_ind);
-
-                                if (_map.containsKey("userId")) {
-                                    if (_map.get("userId")
-                                            .toString()
-                                            .equals(UserConfig.getInstance().getUid())) {
-                                        if (!_map.get("fcm_token").toString().equals(token)) {
-                                            UserConfig.getInstance().updateToken(token);
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (Exception _e) {
-                            _e.printStackTrace();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError _databaseError) {}
-                });
     }
 }

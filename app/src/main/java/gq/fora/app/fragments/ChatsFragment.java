@@ -165,6 +165,15 @@ public class ChatsFragment extends BaseFragment {
     private SharedPreferences sharedPreferences;
     private static final int PICKER_REQUEST_IMAGE = 100;
     private Notify notify;
+    private static ChatsFragment mInstance = null;
+
+    public static ChatsFragment getInstance() {
+        if (mInstance == null) {
+            mInstance = new ChatsFragment();
+        }
+
+        return mInstance;
+    }
 
     private ActivityResultLauncher<Intent> launcher =
             registerForActivityResult(
@@ -223,7 +232,7 @@ public class ChatsFragment extends BaseFragment {
         coordinator = view.findViewById(R.id.coordinator);
         search_text = view.findViewById(R.id.search_text);
 
-        sharedPreferences = getActivity().getSharedPreferences("themes", Context.MODE_PRIVATE);
+        sharedPreferences = initializeApp.context.getSharedPreferences("themes", Context.MODE_PRIVATE);
 
         rv_chat_list.setNestedScrollingEnabled(false);
 
@@ -516,9 +525,10 @@ public class ChatsFragment extends BaseFragment {
 
     public void openBottomSheet() {
         BottomSheetDialog sheet =
-                new BottomSheetDialog(getActivity(), R.style.AppBottomSheetDialogTheme);
+                new BottomSheetDialog(initializeApp.context, R.style.AppBottomSheetDialogTheme);
         View sheetView =
-                getActivity().getLayoutInflater().inflate(R.layout.bottom_sheet_create, null);
+                LayoutInflater.from(initializeApp.context)
+                        .inflate(R.layout.bottom_sheet_create, null);
         sheet.setContentView(sheetView);
 
         final LinearLayout create_story = (LinearLayout) sheetView.findViewById(R.id.create_story);
@@ -575,7 +585,8 @@ public class ChatsFragment extends BaseFragment {
 
         if (sharedPreferences.getString("dark_mode", "").equals("true")) {
             sheetView.setBackground(
-                    ContextCompat.getDrawable(getActivity(), R.drawable.rounded_dialog_night));
+                    ContextCompat.getDrawable(
+                            initializeApp.context, R.drawable.rounded_dialog_night));
             story.setBackground(
                     new GradientDrawable() {
                         public GradientDrawable getIns(int a, int b) {
@@ -623,7 +634,7 @@ public class ChatsFragment extends BaseFragment {
             Utils.rippleRoundStroke(join_room, "#212121", "#e0e0e0", 0, 0, "#ffffff");
         } else {
             sheetView.setBackground(
-                    ContextCompat.getDrawable(getActivity(), R.drawable.rounded_dialog));
+                    ContextCompat.getDrawable(initializeApp.context, R.drawable.rounded_dialog));
             story.setBackground(
                     new GradientDrawable() {
                         public GradientDrawable getIns(int a, int b) {
@@ -692,7 +703,8 @@ public class ChatsFragment extends BaseFragment {
         join_room.setOnClickListener(
                 (View v) -> {
                     AlertDialog.Builder dialog2 =
-                            new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
+                            new AlertDialog.Builder(
+                                    initializeApp.context, R.style.AlertDialogTheme);
                     View dialogView2 =
                             getActivity()
                                     .getLayoutInflater()
@@ -812,121 +824,6 @@ public class ChatsFragment extends BaseFragment {
                                                                                                         .color
                                                                                                         .transparent);
                                                                                 alertDialog.show();
-                                                                                timer =
-                                                                                        new TimerTask() {
-                                                                                            @Override
-                                                                                            public
-                                                                                            void
-                                                                                                    run() {
-                                                                                                getActivity()
-                                                                                                        .runOnUiThread(
-                                                                                                                new Runnable() {
-                                                                                                                    @Override
-                                                                                                                    public
-                                                                                                                    void
-                                                                                                                            run() {
-                                                                                                                        alertDialog
-                                                                                                                                .dismiss();
-                                                                                                                        Map<
-                                                                                                                                        String,
-                                                                                                                                        String>
-                                                                                                                                headers =
-                                                                                                                                        new HashMap<
-                                                                                                                                                String,
-                                                                                                                                                String>();
-                                                                                                                        headers
-                                                                                                                                .put(
-                                                                                                                                        "creator_id",
-                                                                                                                                        snapShot.child(
-                                                                                                                                                        "creator_id")
-                                                                                                                                                .getValue(
-                                                                                                                                                        String
-                                                                                                                                                                .class));
-                                                                                                                        headers
-                                                                                                                                .put(
-                                                                                                                                        "room_name",
-                                                                                                                                        snapShot.child(
-                                                                                                                                                        "room_name")
-                                                                                                                                                .getValue(
-                                                                                                                                                        String
-                                                                                                                                                                .class));
-                                                                                                                        headers
-                                                                                                                                .put(
-                                                                                                                                        "room_id",
-                                                                                                                                        snapShot.child(
-                                                                                                                                                        "room_id")
-                                                                                                                                                .getValue(
-                                                                                                                                                        String
-                                                                                                                                                                .class));
-                                                                                                                        Call
-                                                                                                                                call =
-                                                                                                                                        getSinchServiceInterface()
-                                                                                                                                                .callConference(
-                                                                                                                                                        snapShot.child(
-                                                                                                                                                                        "room_id")
-                                                                                                                                                                .getValue(
-                                                                                                                                                                        String
-                                                                                                                                                                                .class),
-                                                                                                                                                        headers);
-                                                                                                                        String
-                                                                                                                                callId =
-                                                                                                                                        call
-                                                                                                                                                .getCallId();
-
-                                                                                                                        Intent
-                                                                                                                                callScreen =
-                                                                                                                                        new Intent(
-                                                                                                                                                getActivity(),
-                                                                                                                                                RoomActivity
-                                                                                                                                                        .class);
-                                                                                                                        callScreen
-                                                                                                                                .putExtra(
-                                                                                                                                        SinchService
-                                                                                                                                                .CALL_ID,
-                                                                                                                                        callId);
-                                                                                                                        callScreen
-                                                                                                                                .putExtra(
-                                                                                                                                        SinchService
-                                                                                                                                                .EXTRA_ID,
-                                                                                                                                        snapShot.child(
-                                                                                                                                                        "room_id")
-                                                                                                                                                .getValue(
-                                                                                                                                                        String
-                                                                                                                                                                .class));
-                                                                                                                        startActivity(
-                                                                                                                                callScreen);
-                                                                                                                        RoomParticipant
-                                                                                                                                joinRoom =
-                                                                                                                                        new RoomParticipant(
-                                                                                                                                                UserConfig
-                                                                                                                                                        .getInstance()
-                                                                                                                                                        .getUid(),
-                                                                                                                                                snapShot.child(
-                                                                                                                                                                "creator_id")
-                                                                                                                                                        .getValue(
-                                                                                                                                                                String
-                                                                                                                                                                        .class));
-                                                                                                                        participants
-                                                                                                                                .child(
-                                                                                                                                        snapShot.child(
-                                                                                                                                                        "creator_id")
-                                                                                                                                                .getValue(
-                                                                                                                                                        String
-                                                                                                                                                                .class))
-                                                                                                                                .child(
-                                                                                                                                        UserConfig
-                                                                                                                                                .getInstance()
-                                                                                                                                                .getUid())
-                                                                                                                                .setValue(
-                                                                                                                                        joinRoom);
-                                                                                                                    }
-                                                                                                                });
-                                                                                            }
-                                                                                        };
-                                                                                _timer.schedule(
-                                                                                        timer,
-                                                                                        (int)
-                                                                                                (2000));
                                                                             }
                                                                         }
                                                                     } else {
@@ -977,8 +874,7 @@ public class ChatsFragment extends BaseFragment {
                     AlertDialog.Builder dialog =
                             new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
                     View dialogView =
-                            getActivity()
-                                    .getLayoutInflater()
+                            LayoutInflater.from(initializeApp.context)
                                     .inflate(R.layout.dialog_edittext, null);
                     final EditText edittext1 = (EditText) dialogView.findViewById(R.id.edittext1);
                     final ImageView imageview1 =
@@ -1093,7 +989,7 @@ public class ChatsFragment extends BaseFragment {
 
     public void showDialog(String title, String message) {
         MaterialDialog mDialog =
-                new MaterialDialog.Builder(getActivity())
+                new MaterialDialog.Builder(requireActivity())
                         .setTitle(title)
                         .setMessage(message)
                         .setCancelable(false)
